@@ -7,26 +7,25 @@
 import * as Blockly from 'blockly';
 import {javascriptGenerator} from 'blockly/javascript';
 import {save, load} from './serialization.js';
-import { toolbox, categoryStyles } from './toolbox.js';
-import DarkTheme from '@blockly/theme-dark';
+import toolbox from './toolbox.js';
 import CustomRenderer from "./render.js";
+import theme from './theme.js'
 import './index.css';
+
+import './blocks/events.js'
+import './blocks/transforms.js'
 
 // Set up UI elements and inject Blockly
 const codeDiv = document.getElementById('generatedCode').firstChild;
 const outputDiv = document.getElementById('output');
 const blocklyDiv = document.getElementById('blocklyDiv');
 
-export const theme = Blockly.Theme.defineTheme('themeName', {
-	'base': DarkTheme,
-	'startHats': true,
-	blockStyles: Blockly.Themes.Zelos.blockStyles,
-	categoryStyles: Blockly.Themes.Zelos.categoryStyles,
-});
-
 Blockly.blockRendering.register("custom_zelos", CustomRenderer);
 
+const toolboxElement = document.createElement("toolbox");
+toolboxElement.innerHTML = toolbox;
 const ws = Blockly.inject(blocklyDiv, {
+	toolbox: toolboxElement,
 	collapse: true,
 	comments: true,
 	css: true,
@@ -69,7 +68,6 @@ const ws = Blockly.inject(blocklyDiv, {
 		scaleSpeed: 1.2,
 		pinch: true
 	},
-	toolbox,
 });
 
 // This function resets the code and output divs, shows the
@@ -81,7 +79,7 @@ const runCode = () => {
 
 	outputDiv.innerHTML = '';
 
-	eval(code);
+	//eval(code);
 };
 
 // Load the initial state from storage and run the code.

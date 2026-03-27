@@ -21,9 +21,15 @@ function shadowBoolean(value = true) {
 }
 
 const toolbox = `
-    <category name="Events" colour="#ffd900">
+    <category name="Events" colour="#d89c1b">
         ${block("on_start")}
     </category>
+    
+    <category name="Transforms" colour="#2f2ccf">
+        ${block("set_position_to_vector")}
+    </category>
+
+    <category name="Variables" colour="#cf6813" custom="VARIABLES"></category>
 `;
 
 export default toolbox;
