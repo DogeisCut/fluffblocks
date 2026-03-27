@@ -5,6 +5,7 @@
  */
 
 import * as Blockly from 'blockly';
+import {registerContinuousToolbox} from '@blockly/continuous-toolbox';
 import {javascriptGenerator} from 'blockly/javascript';
 import {save, load} from './serialization.js';
 import toolbox from './toolbox.js';
@@ -12,9 +13,28 @@ import CustomRenderer from "./render.js";
 import theme from './theme.js'
 import './index.css';
 
+// really gotta find a better way than just loading these manually.
 import './blocks/events.js'
+import './blocks/control.js'
+import './blocks/input.js'
+import './blocks/math.js'
+import './blocks/strings.js'
+import './blocks/color.js'
 import './blocks/vectors.js'
+import './blocks/arrays.js'
+import './blocks/tables.js'
+import './blocks/sprites.js'
+import './blocks/threads.js'
+import './blocks/matricies.js'
+import './blocks/utility.js'
 import './blocks/transforms.js'
+import './blocks/graphics.js'
+import './blocks/audio.js'
+import './blocks/drawing.js'
+import './blocks/labeling.js'
+import './blocks/debugging.js'
+import './blocks/variables.js'
+import './blocks/functions.js'
 
 // Set up UI elements and inject Blockly
 const codeDiv = document.getElementById('generatedCode').firstChild;
@@ -25,6 +45,7 @@ Blockly.blockRendering.register("custom_zelos", CustomRenderer);
 
 const toolboxElement = document.createElement("toolbox");
 toolboxElement.innerHTML = toolbox;
+registerContinuousToolbox();
 const ws = Blockly.inject(blocklyDiv, {
 	toolbox: toolboxElement,
 	collapse: true,
@@ -51,7 +72,11 @@ const ws = Blockly.inject(blocklyDiv, {
         wheel: true
 	},
 	oneBasedIndex: false,
-	plugins: {},
+	plugins: {
+		flyoutsVerticalToolbox: 'ContinuousFlyout',
+		metricsManager: 'ContinuousMetrics',
+		toolbox: 'ContinuousToolbox',
+	},
 	readOnly: false,
 	renderer: 'custom_zelos',
 	rtl: false,
@@ -70,6 +95,17 @@ const ws = Blockly.inject(blocklyDiv, {
 		pinch: true
 	},
 });
+
+ws.registerToolboxCategoryCallback("VARIABLES", function (_) {
+  const xmlList = [];
+  return xmlList;
+});
+
+ws.registerToolboxCategoryCallback("FUNCTIONS", function (_) {
+  const xmlList = [];
+  return xmlList;
+});
+
 
 // // This function resets the code and output divs, shows the
 // // generated code from the workspace, and evals the code.

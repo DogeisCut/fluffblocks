@@ -1,10 +1,9 @@
-// may do matrixes too
-
 import * as Blockly from "blockly";
 import * as BlocklyJS from "blockly/javascript";
 
 Blockly.Blocks["transforms_sprites_menu"] = {
     init: function () {
+        this.setInputsInline(true);
         this.appendDummyInput().appendField(
         new Blockly.FieldDropdown([
             ["placeholder", ""],
@@ -18,6 +17,7 @@ Blockly.Blocks["transforms_sprites_menu"] = {
 
 Blockly.Blocks["transforms_reparent_to_sprite"] = {
     init: function () {
+        this.setInputsInline(true);
         this.appendValueInput("SPRITE").setCheck("Sprite").appendField("reparent to")
         this.setPreviousStatement(true, "default");
         this.setNextStatement(true, "default");
@@ -27,6 +27,7 @@ Blockly.Blocks["transforms_reparent_to_sprite"] = {
 
 Blockly.Blocks["transforms_set_space_position_to_vector"] = {
     init: function () {
+        this.setInputsInline(true);
         this.appendDummyInput().appendField("set")
         this.appendDummyInput().appendField(
         new Blockly.FieldDropdown([
@@ -44,19 +45,13 @@ Blockly.Blocks["transforms_set_space_position_to_vector"] = {
 
 
 
-BlocklyJS.javascriptGenerator.forBlock["transforms_reparent_to_sprite"] = function (
-  block,
-  generator
-) {
-    const sprite = block.getFieldValue("SPRITE");
-    return `reparentTo(${sprite});`;
+BlocklyJS.javascriptGenerator.forBlock["transforms_reparent_to_sprite"] = function (block, generator) {
+    const SPRITE = block.getFieldValue("SPRITE");
+    return `reparentTo(${SPRITE});`;
 };
 
-BlocklyJS.javascriptGenerator.forBlock["transforms_set_space_position_to_vector"] = function (
-  block,
-  generator
-) {
-    const space = block.getFieldValue("CONSTANT");
-    const vector = generator.valueToCode(block, "VECTOR", BlocklyJS.Order.ATOMIC) || 0;
-    return `setSpacePositionToVector(${space}, ${vector});`;
+BlocklyJS.javascriptGenerator.forBlock["transforms_set_space_position_to_vector"] = function (block, generator) {
+    const SPACE = block.getFieldValue("CONSTANT");
+    const VECTOR = generator.valueToCode(block, "VECTOR", BlocklyJS.Order.ATOMIC) || "Vector.ZERO";
+    return `setSpacePositionToVector("${SPACE}", ${VECTOR});`;
 };

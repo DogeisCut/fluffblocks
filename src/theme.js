@@ -2,16 +2,67 @@ import * as Blockly from "blockly";
 
 const blockStyles = {
     events_blocks: {
-        colourPrimary: "#d89c1b",
+        colourPrimary: "#d81b1b",
+    },
+    control_blocks: {
+        colourPrimary: "#d8571b",
+    },
+    input_blocks: {
+        colourPrimary: "#d8961b",
+    },
+    math_blocks: {
+        colourPrimary: "#cbd81b",
+    },
+    strings_blocks: {
+        colourPrimary: "#9fd81b",
+    },
+    color_blocks: {
+        colourPrimary: "#67d81b",
     },
     vectors_blocks: {
-        colourPrimary: "#2ccfb9",
+        colourPrimary: "#1bd81b",
+    },
+    arrays_blocks: {
+        colourPrimary: "#1bd86a",
+    },
+    tables_blocks: {
+        colourPrimary: "#1bd879",
+    },
+    sprites_blocks: {
+        colourPrimary: "#1bd8a9",
+    },
+    threads_blocks: {
+        colourPrimary: "#1b8cd8",
+    },
+    matricies_blocks: {
+        colourPrimary: "#1b47d8",
+    },
+    utility_blocks: {
+        colourPrimary: "#1e1bd8",
     },
     transforms_blocks: {
-        colourPrimary: "#2f2ccf",
+        colourPrimary: "#631bd8",
     },
-    variable_blocks: {
-        colourPrimary: "#cf6813",
+    graphics_blocks: {
+        colourPrimary: "#8c1bd8",
+    },
+    audio_blocks: {
+        colourPrimary: "#c81bd8",
+    },
+    drawing_blocks: {
+        colourPrimary: "#d81bc8",
+    },
+    labeling_blocks: {
+        colourPrimary: "#d81b90",
+    },
+    debugging_blocks: {
+        colourPrimary: "#d81b83",
+    },
+    variables_blocks: {
+        colourPrimary: "#d81b54",
+    },
+    functions_blocks: {
+        colourPrimary: "#d81b34",
     },
 };
 
