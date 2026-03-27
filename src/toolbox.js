@@ -103,12 +103,6 @@ const toolbox = `
     </category>
 
     ${sep()}
-
-    <category name="Variables" colour="#d81b54" custom="VARIABLES">
-    </category>
-
-    <category name="Functions" colour="#d81b34" custom="FUNCTIONS">
-    </category>
 `;
 
 export default toolbox;
