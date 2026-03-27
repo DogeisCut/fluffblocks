@@ -4,8 +4,11 @@ const blockStyles = {
     events_blocks: {
         colourPrimary: "#d89c1b",
     },
+    vectors_blocks: {
+        colourPrimary: "#2ccfb9",
+    },
     transforms_blocks: {
-        colourPrimary: "2f2ccf",
+        colourPrimary: "#2f2ccf",
     },
     variable_blocks: {
         colourPrimary: "#cf6813",
