@@ -23,7 +23,7 @@ Blockly.Blocks["labeling_placeholder"] = {
         this.setPreviousStatement(!inInput);
         this.setNextStatement(!inInput);
 
-        // todo: fix undo
+        // TODO: fix undo
     },
 };
 
@@ -56,7 +56,9 @@ Blockly.Blocks["labeling_label"] = {
         this.getInput("VALUE")?.setVisible(!inStack && inAnything);
         this.getInput("DO")?.setVisible(!inInput && inAnything);
 
-        // todo: fix undo
+        // TODO: fix undo
+        // TODO: make reporter version less ugly (probably will be fixed with mutators tbh)
+        // TODO: make block hover preview show result
     },
 };
 
