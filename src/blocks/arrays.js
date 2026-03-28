@@ -22,7 +22,9 @@ Blockly.Blocks["arrays_array_mutator_item"] = {
         this.savedValue_ = null;
     },
 }
-Blockly.Blocks['arrays_array'] = { // TODO: fix really minor undo issue where blocks added into inputs dont get deleted when undoing 
+// TODO: fix really minor undo issue where blocks added into inputs dont get deleted when undoing
+// TODO: make shadowed blocks save the values typed in them too
+Blockly.Blocks['arrays_array'] = {
     init: function () {
         this.itemCount_ = 1;
         this.nextId_ = 0;
