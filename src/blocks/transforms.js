@@ -47,11 +47,11 @@ Blockly.Blocks["transforms_set_space_position_to_vector"] = {
 
 BlocklyJS.javascriptGenerator.forBlock["transforms_reparent_to_sprite"] = function (block, generator) {
     const SPRITE = block.getFieldValue("SPRITE");
-    return `reparentTo(${SPRITE});`;
+    return `reparentTo(${SPRITE});\n`;
 };
 
 BlocklyJS.javascriptGenerator.forBlock["transforms_set_space_position_to_vector"] = function (block, generator) {
     const SPACE = block.getFieldValue("CONSTANT");
     const VECTOR = generator.valueToCode(block, "VECTOR", BlocklyJS.Order.ATOMIC) || "Vector.ZERO";
-    return `setSpacePositionToVector("${SPACE}", ${VECTOR});`;
+    return `setSpacePositionToVector("${SPACE}", ${VECTOR});\n`;
 };

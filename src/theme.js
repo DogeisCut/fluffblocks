@@ -64,6 +64,9 @@ const blockStyles = {
     functions_blocks: {
         colourPrimary: "#d81b34",
     },
+    values: {
+        colourPrimary: "#ffffff",
+    },
 };
 
 const theme = Blockly.Theme.defineTheme('themeName', {

@@ -13,6 +13,9 @@ function sep(sep = 30) {
 function shadowNumber(value = 10) {
     return `<shadow type="math_number"><field name="NUM">${value}</field></shadow>`;
 }
+function shadowAny(value = "") {
+    return `<shadow type="values_any"><field name="ANY">${value}</field></shadow>`;
+}
 function shadowText(value = "") {
     return `<shadow type="text"><field name="TEXT">${value}</field></shadow>`;
 }
@@ -34,7 +37,8 @@ const toolbox = `
     ${sep()}
 
     <category name="Math" colour="#cbd81b">
-        ${block("math_binary", value('A', shadowNumber()), value('B', shadowNumber()))}
+        ${block("math_number")}
+        ${block("math_binary", value('A', shadowAny()), value('B', shadowAny()))}
     </category>
 
     <category name="Strings" colour="#9fd81b">
@@ -55,6 +59,7 @@ const toolbox = `
     </category>
 
     <category name="Arrays" colour="#1bd86a">
+        ${block("arrays_array")}
     </category>
 
     <category name="Tables" colour="#1bd879">

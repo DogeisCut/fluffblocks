@@ -35,6 +35,9 @@ import './blocks/labeling.js'
 import './blocks/debugging.js'
 import './blocks/variables.js'
 import './blocks/functions.js'
+import './blocks/values.js'
+
+window.Blockly = Blockly
 
 // Set up UI elements and inject Blockly
 const codeDiv = document.getElementById('generatedCode').firstChild;
