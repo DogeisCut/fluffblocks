@@ -13,6 +13,9 @@ function sep(sep = 30) {
 function shadowNumber(value = 10) {
     return `<shadow type="values_number"><field name="NUMBER">${value}</field></shadow>`;
 }
+function shadowBoolean(value = false) {
+    return `<shadow type="values_boolean"><field name="BOOLEAN">${value ? 'TRUE' : 'FALSE'}</field></shadow>`;
+}
 function shadowAny(value = "") {
     return `<shadow type="values_any"><field name="ANY">${value}</field></shadow>`;
 }
@@ -22,9 +25,6 @@ function shadowVector(x = 0, y = 0) {
 }
 function shadowSTRING(value = "") {
     return `<shadow type="values_string"><field name="STRING">${value}</field></shadow>`;
-}
-function shadowBoolean(value = true) {
-    return `<shadow type="logic_boolean"><field name="BOOL">${value ? "TRUE" : "FALSE"}</field></shadow>`;
 }
 
 const toolbox = `
@@ -40,10 +40,13 @@ const toolbox = `
 
     ${sep()}
 
-    <category name="Math" colour="#cbd81b">
+    <category name="Booleans" colour="#d8c51b">
+        ${block("values_boolean")}
+    </category>
+
+    <category name="Numbers" colour="#cbd81b">
         ${block("values_number")}
         ${sep(50)}
-        ${block("math_binary", value('A', shadowAny()), value('B', shadowAny()))}
     </category>
 
     <category name="Strings" colour="#9fd81b">
@@ -91,6 +94,7 @@ const toolbox = `
     <category name="Utility" colour="#1e1bd8">
         ${block("values_any")}
         ${sep(50)}
+        ${block("utility_binary_operations", value('A', shadowAny()), value('B', shadowAny()))}
     </category>
 
     ${sep()}

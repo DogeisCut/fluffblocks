@@ -2,6 +2,16 @@ import * as Blockly from "blockly";
 import * as BlocklyJS from "blockly/javascript";
 // internal category
 
+Blockly.Blocks["values_boolean"] = {
+    init() {
+        this.setInputsInline(true);
+        this.appendDummyInput()
+            .appendField(new Blockly.FieldCheckbox(), "BOOLEAN");
+        this.setOutput(true, "Boolean");
+        this.setStyle("values");
+    }
+};
+
 Blockly.Blocks["values_number"] = {
     init() {
         this.setInputsInline(true);
@@ -56,7 +66,11 @@ Blockly.Blocks["values_vector"] = { // TODO: custom vector field
     }
 };
 
-
+BlocklyJS.javascriptGenerator.forBlock["values_boolean"] = function(block) {
+    const BOOLEAN = block.getFieldValue("BOOLEAN");
+    const code = Boolean(BOOLEAN === 'TRUE');
+    return [code, BlocklyJS.Order.ATOMIC];
+};
 
 BlocklyJS.javascriptGenerator.forBlock["values_number"] = function(block) {
     const NUMBER = block.getFieldValue("NUMBER");

@@ -10,7 +10,10 @@ const blockStyles = {
     input_blocks: {
         colourPrimary: "#d8961b",
     },
-    math_blocks: {
+    booleans_blocks: {
+        colourPrimary: "#d8c51b",
+    },
+    numbers_blocks: {
         colourPrimary: "#cbd81b",
     },
     strings_blocks: {
