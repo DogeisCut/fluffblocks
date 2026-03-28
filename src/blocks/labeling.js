@@ -59,6 +59,8 @@ Blockly.Blocks["labeling_label"] = {
         // TODO: fix undo
         // TODO: make reporter version less ugly (probably will be fixed with mutators tbh)
         // TODO: make block hover preview show result
+        // TODO: prevent putting blocks in stack while hidden (causes error as it tries to remove statements without disconnect)
+        // TODO: prevent putting blocks in value while hidden (causes error as it tries to remove output without disconnect)
     },
 };
 
