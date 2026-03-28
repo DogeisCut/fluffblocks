@@ -42,6 +42,11 @@ const toolbox = `
 
     <category name="Booleans" colour="#DCC458">
         ${block("values_boolean")}
+        ${sep(50)}
+        ${block("booleans_any_to_boolean", value('ANY', shadowAny("false")))}
+        ${sep(50)}
+        ${block("booleans_binary_logic")}
+        ${block("booleans_not")}
     </category>
 
     <category name="Numbers" colour="#D4E05A">
