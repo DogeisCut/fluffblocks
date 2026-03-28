@@ -56,53 +56,6 @@ Blockly.Blocks["labeling_label"] = {
         this.getInput("VALUE")?.setVisible(!inStack && inAnything);
         this.getInput("DO")?.setVisible(!inInput && inAnything);
 
-        // if (!inAnything) {
-        //     this.removeInput("VALUE", true);
-        //     this.removeInput("DO", true);
-        // } else {
-        //     if (inInput) {
-        //         this.removeInput("DO", true);
-        //         if (!this.getInput("VALUE")) {
-        //             this.appendValueInput("VALUE");
-        //             this.moveInputBefore("VALUE", "LABEL_TEXT");
-        //         }
-        //     } else if (inStack) {
-        //         this.removeInput("VALUE", true);
-        //         if (!this.getInput("DO")) {
-        //             this.appendStatementInput("DO").setCheck("default");
-        //             this.moveInputBefore("DO", "LABEL_TEXT");
-        //         }
-        //     } else {
-        //         if (!this.getInput("VALUE")) {
-        //             this.appendValueInput("VALUE");
-        //             this.moveInputBefore("VALUE", "LABEL_TEXT");
-        //         }
-        //         if (!this.getInput("DO")) {
-        //             this.appendStatementInput("DO").setCheck("default");
-        //             this.moveInputBefore("DO", "LABEL_TEXT");
-        //         }
-        //     }
-        // }
-
-
-        // this bricks any blocks put in the stack for some reason, as in you cant put blocks in thier inputs
-        // if (!inAnything) {
-        //     this.getInput("VALUE")?.setCheck([])
-        //     this.getInput("DO")?.setCheck([])
-        // } else {
-        //     if (inInput) {
-        //         this.getInput("VALUE")?.setCheck(null)
-        //         this.getInput("DO")?.setCheck([])
-        //     } else if (inStack) {
-        //         this.getInput("VALUE")?.setCheck([])
-        //         this.getInput("DO")?.setCheck('default')
-        //     } else {
-        //         this.getInput("VALUE")?.setCheck(null)
-        //         this.getInput("DO")?.setCheck('default')
-        //     }
-        // }
-
-        // todo: prevent placement and kick out contents when hidden
         // todo: fix undo
     },
 };
