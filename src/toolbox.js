@@ -47,6 +47,7 @@ const toolbox = `
     <category name="Numbers" colour="#D4E05A">
         ${block("values_number")}
         ${sep(50)}
+        ${block("number_any_to_number", value('ANY', shadowAny("10")))}
     </category>
 
     <category name="Strings" colour="#B2E45B">
@@ -95,6 +96,7 @@ const toolbox = `
         ${block("values_any")}
         ${sep(50)}
         ${block("utility_binary_operations", value('A', shadowAny()), value('B', shadowAny()))}
+        ${block("utility_binary_comparisons", value('A', shadowAny()), value('B', shadowAny()))}
     </category>
 
     ${sep()}

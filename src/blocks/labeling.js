@@ -161,7 +161,7 @@ BlocklyJS.javascriptGenerator.forBlock["labeling_label"] = function (block, gene
 
     if (block.mode_ === 'input') { 
         const value = generator.valueToCode(block, "VALUE", BlocklyJS.Order.ATOMIC) || 'null';
-        return [`${value} /* ${label} */`, BlocklyJS.Order.NONE];
+        return [`(${value} /* ${label} */)`, BlocklyJS.Order.NONE];
     } else if (block.mode_ === 'stack') {
         const branch = generator.statementToCode(block, "DO")
         return `/* ${label} */ {\n${branch}\n};\n`;

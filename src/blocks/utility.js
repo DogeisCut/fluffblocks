@@ -23,12 +23,33 @@ Blockly.Blocks["utility_binary_operations"] = {
     },
 };
 
+Blockly.Blocks["utility_binary_comparisons"] = {
+    init: function () {
+        this.setInputsInline(true);
+        this.appendValueInput("A")
+        this.appendDummyInput().appendField(
+        new Blockly.FieldDropdown([
+            ["=", "=="],
+            ["==", "==="],
+            [">", ">"],
+            ["<", "<"],
+            [">=", ">="],
+            ["<=", "<="],
+        ]),
+        "MENU"
+        );
+        this.appendValueInput("B")
+        this.setOutput(true, "Boolean");
+        this.setStyle("utility_blocks");
+    },
+};
+
 
 
 BlocklyJS.javascriptGenerator.forBlock["utility_binary_operations"] = function (block, generator) {
     const MENU = block.getFieldValue("MENU");
-    const A = generator.valueToCode(block, "A", BlocklyJS.Order.ATOMIC) || "0";
-    const B = generator.valueToCode(block, "B", BlocklyJS.Order.ATOMIC) || "0";
+    const A = generator.valueToCode(block, "A", BlocklyJS.Order.ATOMIC) || "";
+    const B = generator.valueToCode(block, "B", BlocklyJS.Order.ATOMIC) || "";
 
     // decided to comment this out since this doesnt handle the value_any block (as it just always assumes to directly use operators)
     // ugh i wouldnt have to deal with this if js had operator overloads
@@ -52,4 +73,12 @@ BlocklyJS.javascriptGenerator.forBlock["utility_binary_operations"] = function (
     // }
 
     return [`handleBinaryOperation("${MENU}", ${A}, ${B})`, BlocklyJS.Order.NONE];
+};
+
+BlocklyJS.javascriptGenerator.forBlock["utility_binary_comparisons"] = function (block, generator) {
+    const MENU = block.getFieldValue("MENU");
+    const A = generator.valueToCode(block, "A", BlocklyJS.Order.ATOMIC) || "";
+    const B = generator.valueToCode(block, "B", BlocklyJS.Order.ATOMIC) || "";
+
+    return [`${A} ${MENU} ${B}`, BlocklyJS.Order.NONE];
 };
