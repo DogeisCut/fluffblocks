@@ -13,33 +13,15 @@ import CustomRenderer from "./render.js";
 import theme from './theme.js'
 import './index.css';
 
-// really gotta find a better way than just loading these manually.
-import './blocks/events.js'
-import './blocks/control.js'
-import './blocks/input.js'
-import './blocks/math.js'
-import './blocks/strings.js'
-import './blocks/color.js'
-import './blocks/vectors.js'
-import './blocks/arrays.js'
-import './blocks/tables.js'
-import './blocks/sprites.js'
-import './blocks/threads.js'
-import './blocks/matricies.js'
-import './blocks/utility.js'
-import './blocks/transforms.js'
-import './blocks/graphics.js'
-import './blocks/audio.js'
-import './blocks/drawing.js'
-import './blocks/labeling.js'
-import './blocks/debugging.js'
-import './blocks/variables.js'
-import './blocks/functions.js'
-import './blocks/values.js'
+// i dont even want to think about the default blocks
+Object.keys(Blockly.Blocks).forEach(key => delete Blockly.Blocks[key]);
+Object.keys(javascriptGenerator.forBlock).forEach(key => delete javascriptGenerator.forBlock[key]);
+
+const context = require.context('./blocks', false, /\.js$/);
+context.keys().forEach(context);
 
 window.Blockly = Blockly
 
-// Set up UI elements and inject Blockly
 const codeDiv = document.getElementById('generatedCode').firstChild;
 const outputDiv = document.getElementById('output');
 const blocklyDiv = document.getElementById('blocklyDiv');
@@ -109,36 +91,29 @@ ws.registerToolboxCategoryCallback("FUNCTIONS", function (_) {
   return xmlList;
 });
 
+// will replace this with stuff to interface with the vm later
+const compile = () => {
+    javascriptGenerator.init(ws);
+    const code = [];
 
-// // This function resets the code and output divs, shows the
-// // generated code from the workspace, and evals the code.
-// // In a real application, you probably shouldn't use `eval`.
-const runCode = () => {
-	const code = javascriptGenerator.workspaceToCode(ws);
-	codeDiv.innerText = code;
+    for (const block of ws.getTopBlocks(true)) {
+        if (block.previousConnection || block.outputConnection) continue;
 
-	outputDiv.innerHTML = '';
+        let line = javascriptGenerator.blockToCode(block);
+        if (Array.isArray(line)) line = line[0];
+        if (line) code.push(line);
+    }
 
-	//eval(code);
+    let codeString = code.join('\n');
+    codeString = javascriptGenerator.finish(codeString);
+    codeString = codeString.replace(/^\s+\n/, '');
+    codeString = codeString.replace(/\n\s+$/, '\n');
+    codeString = codeString.replace(/[ \t]+\n/g, '\n');
+
+    codeDiv.innerText = codeString;
+    outputDiv.innerHTML = '';
 };
-
-// // Load the initial state from storage and run the code.
-// load(ws);
-// runCode();
-
-// // Every time the workspace changes state, save the changes to storage.
-// ws.addChangeListener((e) => {
-// 	// UI events are things like scrolling, zooming, etc.
-// 	// No need to save after one of these.
-// 	if (e.isUiEvent) return;
-// 	save(ws);
-// });
-
-// Whenever the workspace changes meaningfully, run the code again.
 ws.addChangeListener((e) => {
-	// Don't run the code when the workspace finishes loading; we're
-	// already running it once when the application starts.
-	// Don't run the code during drags; we might have invalid state.
 	if (
 		e.isUiEvent ||
 		e.type == Blockly.Events.FINISHED_LOADING ||
@@ -146,5 +121,5 @@ ws.addChangeListener((e) => {
 	) {
 		return;
 	}
-	runCode();
+	compile();
 });

@@ -22,7 +22,7 @@ Blockly.Blocks["arrays_array_mutator_item"] = {
         this.savedValue_ = null;
     },
 }
-Blockly.Blocks['arrays_array'] = {
+Blockly.Blocks['arrays_array'] = { // TODO: fix really minor undo issue where blocks added into inputs dont get deleted when undoing 
     init: function () {
         this.itemCount_ = 1;
         this.nextId_ = 0;
@@ -133,15 +133,14 @@ Blockly.Blocks['arrays_array'] = {
                 var input = this.appendValueInput(id).setCheck(null);
                 var conn = connections[id];
 
-                var shadow = this.workspace.newBlock('values_any');
-                shadow.setShadow(true);
-                shadow.initSvg();
-                shadow.render();
-                input.connection.connect(shadow.outputConnection);
-
                 if (conn && conn.getSourceBlock && conn.getSourceBlock()) {
                     conn.reconnect(this, id);
                 }
+
+                var shadowDom = Blockly.utils.xml.textToDom(
+                    '<shadow type="values_any"></shadow>'
+                );
+                input.connection.setShadowDom(shadowDom);
             }
             this.moveInputBefore(id, null);
         }
@@ -152,6 +151,16 @@ Blockly.Blocks['arrays_array'] = {
         }
 
         this.itemIds_ = ids;
+    },
+};
+
+Blockly.Blocks['arrays_array_builder'] = {
+    init: function () {
+        this.setInputsInline(true);
+        this.appendDummyInput().appendField('array builder');
+        this.appendStatementInput("DO").setCheck("default");
+        this.setOutput(true, 'Array');
+        this.setStyle('arrays_blocks');
     },
 };
 

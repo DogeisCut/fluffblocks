@@ -34,7 +34,7 @@ const blockStyles = {
     threads_blocks: {
         colourPrimary: "#1b8cd8",
     },
-    matricies_blocks: {
+    matrices_blocks: {
         colourPrimary: "#1b47d8",
     },
     utility_blocks: {
@@ -53,7 +53,7 @@ const blockStyles = {
         colourPrimary: "#d81bc8",
     },
     labeling_blocks: {
-        colourPrimary: "#d81b90",
+        colourPrimary: "#777777",
     },
     debugging_blocks: {
         colourPrimary: "#d81b83",

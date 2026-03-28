@@ -10,8 +10,50 @@ class CustomConstantProvider extends Blockly.zelos.ConstantProvider {
         this.SCRAPPED = this.makeBowl(); // Matrix
         this.BRACKET = this.makeBowl(); // Tables
         this.BOWL = this.makeBowl(); // Arrays
-        this.OCTAGONAL = this.makeBowl(); // Sprite
+        this.OCTAGONAL = this.makeOctagonal(); // Sprite
         this.DECAGONAL = this.makeBowl(); // Color
+    }
+
+    makeOctagonal() {
+        const maxW = this.MAX_DYNAMIC_CONNECTION_SHAPE_WIDTH;
+        const maxH = maxW * 2;
+
+        function makeMainPath(blockHeight, up, right) {
+            const remainingHeight = blockHeight > maxH ? blockHeight - maxH : 0;
+            const height = blockHeight > maxH ? maxH : blockHeight;
+
+            const dirX = right ? 1 : -1;
+            const dirY = up ? -1 : 1;
+
+            const q = height / 4;
+            const w = Math.min(q, maxW);
+
+            return (
+                svgPaths.lineOnAxis("h",  w * dirX) +
+                svgPaths.lineTo(w * dirX,  q * dirY) +
+                svgPaths.lineOnAxis("v",  q * dirY) +
+                svgPaths.lineOnAxis("v",  remainingHeight * dirY) +
+                svgPaths.lineOnAxis("v",  q * dirY) +
+                svgPaths.lineTo(-w * dirX, q * dirY) +
+                svgPaths.lineOnAxis("h", -w * dirX)
+            );
+        }
+
+        return {
+            type: this.SHAPES.ROUND,
+            isDynamic: true,
+            width(height) {
+                const q = height / 2;
+                return q > maxW ? maxW : q;
+            },
+            height(height)            { return height; },
+            connectionOffsetY(height) { return height / 2; },
+            connectionOffsetX(width)  { return -width; },
+            pathDown(height)          { return makeMainPath(height, false, false); },
+            pathUp(height)            { return makeMainPath(height, true,  false); },
+            pathRightDown(height)     { return makeMainPath(height, false, true);  },
+            pathRightUp(height)       { return makeMainPath(height, false, true);  },
+        };
     }
 
     makeBumped() {
@@ -98,10 +140,10 @@ class CustomConstantProvider extends Blockly.zelos.ConstantProvider {
 
             return `
                 h ${radius / 2}
-                l ${radius} ${totalHeight/4*dirU}
-                l ${-radius} ${totalHeight/4*dirU}
-                l ${radius} ${totalHeight/4*dirU}
-                l ${-radius} ${totalHeight/4*dirU}
+                l ${radius} ${totalHeight / 4 * dirU}
+                l ${-radius} ${totalHeight / 4 * dirU}
+                l ${radius} ${totalHeight / 4 * dirU}
+                l ${-radius} ${totalHeight / 4 * dirU}
                 h ${-radius / 2}
             `;
         }
@@ -227,9 +269,9 @@ class CustomConstantProvider extends Blockly.zelos.ConstantProvider {
             const radius = (height / 4) * dirR;
 
             return `
-                h ${radius*2}
-                l ${-radius} ${totalHeight/2 * dirU}
-                l ${radius} ${totalHeight/2 * dirU}
+                h ${radius * 2}
+                l ${-radius} ${totalHeight / 2 * dirU}
+                l ${radius} ${totalHeight / 2 * dirU}
             `;
         }
 
@@ -243,9 +285,9 @@ class CustomConstantProvider extends Blockly.zelos.ConstantProvider {
             const radius = (height / 4) * dirR;
 
             return `
-                h ${radius/2}
-                l ${radius} ${totalHeight/2 * dirU}
-                l ${-radius} ${totalHeight/2 * dirU}
+                h ${radius / 2}
+                l ${radius} ${totalHeight / 2 * dirU}
+                l ${-radius} ${totalHeight / 2 * dirU}
             `;
         }
 
@@ -281,13 +323,16 @@ class CustomConstantProvider extends Blockly.zelos.ConstantProvider {
     }
 
     /**
-   * @param {Blockly.RenderedConnection} connection
-   */
+     * @param {Blockly.RenderedConnection} connection
+    */
     shapeFor(connection) {
         let checks = connection.getCheck() ?? [];
-        if (!checks && connection.targetConnection)
+
+        if ((!checks || checks.length === 0) && connection.targetConnection) {
             checks = connection.targetConnection.getCheck() ?? [];
-        let outputShape = connection.sourceBlock_.getOutputShape();
+        }
+
+        let outputShape = connection.sourceBlock_?.getOutputShape();
 
         if (connection.type === 1 || connection.type === 2) {
             if (checks.includes("String") || outputShape === 4) {
