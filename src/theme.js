@@ -2,70 +2,70 @@ import * as Blockly from "blockly";
 
 const blockStyles = {
     events_blocks: {
-        colourPrimary: "#d81b1b",
+        colourPrimary: "#CC5252",
     },
     control_blocks: {
-        colourPrimary: "#d8571b",
+        colourPrimary: "#D27654",
     },
     input_blocks: {
-        colourPrimary: "#d8961b",
+        colourPrimary: "#D79D56",
     },
     booleans_blocks: {
-        colourPrimary: "#d8c51b",
+        colourPrimary: "#DCC458",
     },
     numbers_blocks: {
-        colourPrimary: "#cbd81b",
+        colourPrimary: "#D4E05A",
     },
     strings_blocks: {
-        colourPrimary: "#9fd81b",
+        colourPrimary: "#B2E45B",
     },
     color_blocks: {
-        colourPrimary: "#67d81b",
+        colourPrimary: "#8FE75C",
     },
     vectors_blocks: {
-        colourPrimary: "#1bd81b",
+        colourPrimary: "#6AE95D",
     },
     arrays_blocks: {
-        colourPrimary: "#1bd86a",
+        colourPrimary: "#5EEB77",
     },
     tables_blocks: {
-        colourPrimary: "#1bd879",
+        colourPrimary: "#5EEC9E",
     },
     sprites_blocks: {
-        colourPrimary: "#1bd8a9",
+        colourPrimary: "#5EECC5",
     },
     threads_blocks: {
-        colourPrimary: "#1b8cd8",
+        colourPrimary: "#5EECEC",
     },
     matrices_blocks: {
-        colourPrimary: "#1b47d8",
+        colourPrimary: "#5EC4EB",
     },
     utility_blocks: {
-        colourPrimary: "#1e1bd8",
+        colourPrimary: "#5D9DE9",
     },
     transforms_blocks: {
-        colourPrimary: "#631bd8",
+        colourPrimary: "#5C75E7",
     },
     graphics_blocks: {
-        colourPrimary: "#8c1bd8",
+        colourPrimary: "#685BE4",
     },
     audio_blocks: {
-        colourPrimary: "#c81bd8",
+        colourPrimary: "#8B5AE0",
     },
     drawing_blocks: {
-        colourPrimary: "#d81bc8",
+        colourPrimary: "#AC58DC",
     },
     labeling_blocks: {
-        colourPrimary: "#777777",
+        colourPrimary: "#999999",
     },
     debugging_blocks: {
-        colourPrimary: "#d81b83",
+        colourPrimary: "#666666",
     },
     variables_blocks: {
-        colourPrimary: "#d81b54",
+        colourPrimary: "#D254BB",
     },
     functions_blocks: {
-        colourPrimary: "#d81b34",
+        colourPrimary: "#CC5294",
     },
     values: {
         colourPrimary: "#ffffff",

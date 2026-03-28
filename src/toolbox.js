@@ -28,36 +28,36 @@ function shadowSTRING(value = "") {
 }
 
 const toolbox = `
-    <category name="Events" colour="#d81b1b">
+    <category name="Events" colour="#CC5252">
         ${block("events_on_start")}
     </category>
 
-    <category name="Control" colour="#d8571b">
+    <category name="Control" colour="#D27654">
     </category>
 
-    <category name="Input" colour="#d8961b">
+    <category name="Input" colour="#D79D56">
     </category>
 
     ${sep()}
 
-    <category name="Booleans" colour="#d8c51b">
+    <category name="Booleans" colour="#DCC458">
         ${block("values_boolean")}
     </category>
 
-    <category name="Numbers" colour="#cbd81b">
+    <category name="Numbers" colour="#D4E05A">
         ${block("values_number")}
         ${sep(50)}
     </category>
 
-    <category name="Strings" colour="#9fd81b">
+    <category name="Strings" colour="#B2E45B">
         ${block("values_string")}
         ${sep(50)}
     </category>
 
-    <category name="Color" colour="#67d81b">
+    <category name="Color" colour="#8FE75C">
     </category>
 
-    <category name="Vectors" colour="#1bd81b">
+    <category name="Vectors" colour="#6AE95D">
         ${block("vectors_vector_of_menu")}
         ${block("vectors_vector_x_y", value('X', shadowNumber(1)), value('Y', shadowNumber(1)))}
         ${block("vectors_vector_magnitude_angle", value('MAGNITUDE', shadowNumber(1)), value('ANGLE', shadowNumber(45)))}
@@ -68,30 +68,30 @@ const toolbox = `
         ${block("vectors_vector_rotated_by_angle", value('ANGLE', shadowNumber(45)))}
     </category>
 
-    <category name="Arrays" colour="#1bd86a">
+    <category name="Arrays" colour="#5EEB77">
         ${block("arrays_array")}
         ${sep(50)}
         ${block("arrays_array_builder")}
         ${block("arrays_append_value_to_builder", value('ANY', shadowAny('foo')))}
     </category>
 
-    <category name="Tables" colour="#1bd879">
+    <category name="Tables" colour="#5EEC9E">
     </category>
 
-    <category name="Sprites" colour="#1bd8a9">
+    <category name="Sprites" colour="#5EECC5">
     </category>
 
-    <category name="Threads" colour="#1b8cd8">
+    <category name="Threads" colour="#5EECEC">
     </category>
 
-    <category name="Matrices" colour="#1b47d8">
+    <category name="Matrices" colour="#5EC4EB">
         ${block("matrices_matrix", value('X', shadowVector(1, 0)), value('Y', shadowVector(0, 1)), value('ORIGIN', shadowVector(0, 0)))}
         ${sep(50)}
     </category>
 
     ${sep()}
 
-    <category name="Utility" colour="#1e1bd8">
+    <category name="Utility" colour="#5D9DE9">
         ${block("values_any")}
         ${sep(50)}
         ${block("utility_binary_operations", value('A', shadowAny()), value('B', shadowAny()))}
@@ -99,7 +99,7 @@ const toolbox = `
 
     ${sep()}
 
-    <category name="Transforms" colour="#631bd8">
+    <category name="Transforms" colour="#5C75E7">
         ${block("transforms_reparent_to_sprite")}
         ${sep(50)}
         ${block("transforms_set_space_position_to_vector")}
@@ -109,15 +109,15 @@ const toolbox = `
 
     ${sep()}
 
-    <category name="Graphics" colour="#8c1bd8">
+    <category name="Graphics" colour="#685BE4">
     </category>
 
-    <category name="Audio" colour="#c81bd8">
+    <category name="Audio" colour="#8B5AE0">
     </category>
 
     ${sep()}
 
-    <category name="Drawing" colour="#d81bc8">
+    <category name="Drawing" colour="#AC58DC">
     </category>
 
     ${sep()}
@@ -127,16 +127,16 @@ const toolbox = `
         ${block('labeling_label')}
     </category>
 
-    <category name="Debugging" colour="#d81b83">
+    <category name="Debugging" colour="#666666">
         ${block("print_any_to_console", value('ANY', shadowAny("foo")))}
     </category>
 
     ${sep()}
 
-    <category name="Variables" colour="#d81b54">
+    <category name="Variables" colour="#D254BB">
     </category>
 
-    <category name="Functions" colour="#d81b34">
+    <category name="Functions" colour="#CC5294">
     </category>
 
 

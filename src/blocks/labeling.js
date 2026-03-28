@@ -100,10 +100,12 @@ Blockly.Blocks["labeling_label"] = {
                 this.setOutput(true);
                 this.setPreviousStatement(false);
                 this.setNextStatement(false);
-                if (!this.getInput("VALUE")) {
-                    this.appendValueInput("VALUE");
+                let valueInput = this.getInput("VALUE")
+                if (!valueInput) {
+                    valueInput = this.appendValueInput("VALUE");
                     this.moveInputBefore("VALUE", "LABEL_TEXT");
                 }
+                valueInput.setCheck(this.outputConnection?.targetConnection?.check);
                 this.removeInput("DO", true);
                 break;
         }
@@ -162,7 +164,7 @@ BlocklyJS.javascriptGenerator.forBlock["labeling_label"] = function (block, gene
         return [`${value} /* ${label} */`, BlocklyJS.Order.NONE];
     } else if (block.mode_ === 'stack') {
         const branch = generator.statementToCode(block, "DO")
-        return `/* ${label} */ {\n${branch}\n};`;
+        return `/* ${label} */ {\n${branch}\n};\n`;
     }
     return '';
 };
