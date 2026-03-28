@@ -84,6 +84,24 @@ Blockly.Blocks["labeling_label"] = {
         //     }
         // }
 
+
+        // this bricks any blocks put in the stack for some reason, as in you cant put blocks in thier inputs
+        // if (!inAnything) {
+        //     this.getInput("VALUE")?.setCheck([])
+        //     this.getInput("DO")?.setCheck([])
+        // } else {
+        //     if (inInput) {
+        //         this.getInput("VALUE")?.setCheck(null)
+        //         this.getInput("DO")?.setCheck([])
+        //     } else if (inStack) {
+        //         this.getInput("VALUE")?.setCheck([])
+        //         this.getInput("DO")?.setCheck('default')
+        //     } else {
+        //         this.getInput("VALUE")?.setCheck(null)
+        //         this.getInput("DO")?.setCheck('default')
+        //     }
+        // }
+
         // todo: prevent placement and kick out contents when hidden
         // todo: fix undo
     },
