@@ -64,7 +64,7 @@ Blockly.Blocks["transforms_set_space_transform_to_vector"] = {
 
 
 BlocklyJS.javascriptGenerator.forBlock["transforms_reparent_to_sprite"] = function (block, generator) {
-    const SPRITE = block.getFieldValue("SPRITE");
+    const SPRITE = generator.valueToCode(block, "SPRITE", BlocklyJS.Order.ATOMIC) || "";
     return `reparentTo(${SPRITE});\n`;
 };
 
