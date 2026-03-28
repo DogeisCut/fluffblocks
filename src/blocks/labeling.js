@@ -45,8 +45,8 @@ Blockly.Blocks["labeling_label"] = {
     onchange: function (event) {
         if (event.type !== Blockly.Events.BLOCK_DRAG || event.isStart) return;
 
-        const inInput = !!(this.outputConnection?.isConnected());
-        const inStack = !!(this.previousConnection?.isConnected() || this.nextConnection?.isConnected());
+        const inInput = !!(this.outputConnection?.isConnected()) || !!(this.getInput("VALUE")?.connection?.isConnected());
+        const inStack = !!(this.previousConnection?.isConnected() || this.nextConnection?.isConnected()) || !!(this.getInput("DO")?.connection?.isConnected());
         const inAnything = inInput || inStack
 
         this.setOutput(!inStack);
