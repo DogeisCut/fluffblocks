@@ -158,19 +158,19 @@ Blockly.Blocks['arrays_array_builder'] = {
     init: function () {
         this.setInputsInline(true);
         this.appendDummyInput().appendField('array builder');
-        this.appendStatementInput("DO") // purposely accepts any
+        this.appendStatementInput("DO").setCheck("default");
         this.setOutput(true, 'Array');
         this.setStyle('arrays_blocks');
     },
 };
 
-Blockly.Blocks["arrays_append_value_to_builder"] = { // todo: warning when not in array builder
+Blockly.Blocks["arrays_append_value_to_builder"] = { // todo: warning when not in array builder, or just like.. some custom connection checker that only allows the append block if within an array builder
     init: function () {
         this.setInputsInline(true);
         this.appendValueInput("ANY").appendField("append")
         this.appendDummyInput().appendField("to builder")
-        this.setPreviousStatement(true, "Array");
-        this.setNextStatement(true, "Array");
+        this.setPreviousStatement(true);
+        this.setNextStatement(true);
         this.setStyle("arrays_blocks");
     },
 };
