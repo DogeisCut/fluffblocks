@@ -16,6 +16,10 @@ function shadowNumber(value = 10) {
 function shadowAny(value = "") {
     return `<shadow type="values_any"><field name="ANY">${value}</field></shadow>`;
 }
+function shadowVector(x = 0, y = 0) {
+    return `<shadow type="values_vector"><field name="X">${x}</field><field name="Y">${y}</field></shadow>`;
+    //return `<shadow type="vectors_vector_x_y">${value('X', shadowNumber(x))}${value('Y', shadowNumber(y))}</shadow>`;
+}
 function shadowSTRING(value = "") {
     return `<shadow type="values_string"><field name="STRING">${value}</field></shadow>`;
 }
@@ -38,11 +42,13 @@ const toolbox = `
 
     <category name="Math" colour="#cbd81b">
         ${block("values_number")}
+        ${sep(50)}
         ${block("math_binary", value('A', shadowAny()), value('B', shadowAny()))}
     </category>
 
     <category name="Strings" colour="#9fd81b">
         ${block("values_string")}
+        ${sep(50)}
     </category>
 
     <category name="Color" colour="#67d81b">
@@ -50,8 +56,8 @@ const toolbox = `
 
     <category name="Vectors" colour="#1bd81b">
         ${block("vectors_vector_of_menu")}
-        ${block("vectors_vector_x_x_y_y", value('X', shadowNumber(1)), value('Y', shadowNumber(1)))}
-        ${block("vectors_vector_magnitude_magnitude_angle_angle", value('MAGNITUDE', shadowNumber(1)), value('ANGLE', shadowNumber(45)))}
+        ${block("vectors_vector_x_y", value('X', shadowNumber(1)), value('Y', shadowNumber(1)))}
+        ${block("vectors_vector_magnitude_angle", value('MAGNITUDE', shadowNumber(1)), value('ANGLE', shadowNumber(45)))}
         ${sep(50)}
         ${block("vectors_menu_of_vector")}
         ${block("vectors_vector_menu")}
@@ -61,7 +67,9 @@ const toolbox = `
 
     <category name="Arrays" colour="#1bd86a">
         ${block("arrays_array")}
+        ${sep(50)}
         ${block("arrays_array_builder")}
+        ${block("arrays_append_value_to_builder", value('ANY', shadowAny('foo')))}
     </category>
 
     <category name="Tables" colour="#1bd879">
@@ -74,19 +82,25 @@ const toolbox = `
     </category>
 
     <category name="Matrices" colour="#1b47d8">
+        ${block("matrices_matrix", value('X', shadowVector(1, 0)), value('Y', shadowVector(0, 1)), value('ORIGIN', shadowVector(0, 0)))}
+        ${sep(50)}
     </category>
 
     ${sep()}
 
     <category name="Utility" colour="#1e1bd8">
         ${block("values_any")}
+        ${sep(50)}
     </category>
 
     ${sep()}
 
     <category name="Transforms" colour="#631bd8">
         ${block("transforms_reparent_to_sprite")}
+        ${sep(50)}
         ${block("transforms_set_space_position_to_vector")}
+        ${sep(50)}
+        ${block("transforms_set_space_transform_to_vector")}
     </category>
 
     ${sep()}
@@ -112,6 +126,15 @@ const toolbox = `
     <category name="Debugging" colour="#d81b83">
         ${block("print_any_to_console", value('ANY', shadowAny("foo")))}
     </category>
+
+    ${sep()}
+
+    <category name="Variables" colour="#d81b54">
+    </category>
+
+    <category name="Functions" colour="#d81b34">
+    </category>
+
 
     ${sep()}
 `;

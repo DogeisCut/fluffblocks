@@ -158,11 +158,23 @@ Blockly.Blocks['arrays_array_builder'] = {
     init: function () {
         this.setInputsInline(true);
         this.appendDummyInput().appendField('array builder');
-        this.appendStatementInput("DO").setCheck("default");
+        this.appendStatementInput("DO") // purposely accepts any
         this.setOutput(true, 'Array');
         this.setStyle('arrays_blocks');
     },
 };
+
+Blockly.Blocks["arrays_append_value_to_builder"] = { // todo: warning when not in array builder
+    init: function () {
+        this.setInputsInline(true);
+        this.appendValueInput("ANY").appendField("append")
+        this.appendDummyInput().appendField("to builder")
+        this.setPreviousStatement(true, "Array");
+        this.setNextStatement(true, "Array");
+        this.setStyle("arrays_blocks");
+    },
+};
+
 
 BlocklyJS.javascriptGenerator.forBlock["arrays_array"] = function (block, generator) {
     var items = (block.itemIds_ || []).map(function (id) {

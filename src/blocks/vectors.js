@@ -22,7 +22,7 @@ Blockly.Blocks["vectors_vector_of_menu"] = {
     },
 };
 
-Blockly.Blocks["vectors_vector_x_x_y_y"] = {
+Blockly.Blocks["vectors_vector_x_y"] = {
     init: function () {
         this.setInputsInline(true);
         this.appendDummyInput().appendField("vector x:");
@@ -34,7 +34,7 @@ Blockly.Blocks["vectors_vector_x_x_y_y"] = {
     },
 };
 
-Blockly.Blocks["vectors_vector_magnitude_magnitude_angle_angle"] = {
+Blockly.Blocks["vectors_vector_magnitude_angle"] = {
     init: function () {
         this.setInputsInline(true);
         this.appendDummyInput().appendField("vector magnitude:");
@@ -102,13 +102,13 @@ BlocklyJS.javascriptGenerator.forBlock["vectors_vector_of_menu"] = function (blo
     return [`Vector.${MENU}`, BlocklyJS.Order.NONE];
 };
 
-BlocklyJS.javascriptGenerator.forBlock["vectors_vector_x_x_y_y"] = function (block, generator) {
+BlocklyJS.javascriptGenerator.forBlock["vectors_vector_x_y"] = function (block, generator) {
     const X = generator.valueToCode(block, "X", BlocklyJS.Order.ATOMIC) || 0;
     const Y = generator.valueToCode(block, "Y", BlocklyJS.Order.ATOMIC) || 0;
     return [`new Vector(${X}, ${Y})`, BlocklyJS.Order.NONE];
 };
 
-BlocklyJS.javascriptGenerator.forBlock["vectors_vector_magnitude_magnitude_angle_angle"] = function (block, generator) {
+BlocklyJS.javascriptGenerator.forBlock["vectors_vector_magnitude_angle"] = function (block, generator) {
     const MAGNITUDE = generator.valueToCode(block, "MAGNITUDE", BlocklyJS.Order.ATOMIC) || 0;
     const ANGLE = generator.valueToCode(block, "ANGLE", BlocklyJS.Order.ATOMIC) || 0;
     return [`Vector.fromAngle(${ANGLE}, ${MAGNITUDE})`, BlocklyJS.Order.NONE];

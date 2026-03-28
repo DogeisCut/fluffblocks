@@ -43,6 +43,24 @@ Blockly.Blocks["transforms_set_space_position_to_vector"] = {
     },
 };
 
+Blockly.Blocks["transforms_set_space_transform_to_vector"] = {
+    init: function () {
+        this.setInputsInline(true);
+        this.appendDummyInput().appendField("set")
+        this.appendDummyInput().appendField(
+        new Blockly.FieldDropdown([
+            ["local", "local"],
+            ["global", "global"],
+        ]),
+        "CONSTANT"
+        );  
+        this.appendValueInput("MATRIX").setCheck("Matrix").appendField("transform to")
+        this.setPreviousStatement(true, "default");
+        this.setNextStatement(true, "default");
+        this.setStyle("transforms_blocks");
+    },
+};
+
 
 
 BlocklyJS.javascriptGenerator.forBlock["transforms_reparent_to_sprite"] = function (block, generator) {
@@ -53,5 +71,11 @@ BlocklyJS.javascriptGenerator.forBlock["transforms_reparent_to_sprite"] = functi
 BlocklyJS.javascriptGenerator.forBlock["transforms_set_space_position_to_vector"] = function (block, generator) {
     const SPACE = block.getFieldValue("CONSTANT");
     const VECTOR = generator.valueToCode(block, "VECTOR", BlocklyJS.Order.ATOMIC) || "Vector.ZERO";
-    return `setSpacePositionToVector("${SPACE}", ${VECTOR});\n`;
+    return `setPosition("${SPACE}", ${VECTOR});\n`;
+};
+
+BlocklyJS.javascriptGenerator.forBlock["transforms_set_space_transform_to_vector"] = function (block, generator) {
+    const SPACE = block.getFieldValue("CONSTANT");
+    const MATRIX = generator.valueToCode(block, "MATRIX", BlocklyJS.Order.ATOMIC) || "Matrix.IDENTITY";
+    return `setTransform("${SPACE}", ${MATRIX});\n`;
 };

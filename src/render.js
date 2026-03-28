@@ -7,11 +7,53 @@ class CustomConstantProvider extends Blockly.zelos.ConstantProvider {
         this.BUMPED = this.makeBumped(); // String
         this.SPIKE_BUMPED = this.makeSpikeBumped(); // Number
         this.ARROW = this.makeArrow(); // Vector
-        this.SCRAPPED = this.makeBowl(); // Matrix
+        this.SCRAPPED = this.makeScrapped(); // Matrix
         this.BRACKET = this.makeBowl(); // Tables
         this.BOWL = this.makeBowl(); // Arrays
         this.OCTAGONAL = this.makeOctagonal(); // Sprite
         this.DECAGONAL = this.makeBowl(); // Color
+    }
+
+    makeScrapped() { // placeholder shape
+        const maxW = this.MAX_DYNAMIC_CONNECTION_SHAPE_WIDTH;
+        const maxH = maxW * 2;
+
+        function makeMainPath(blockHeight, up, right) {
+            const remainingHeight = blockHeight > maxH ? blockHeight - maxH : 0;
+            const height = blockHeight > maxH ? maxH : blockHeight;
+
+            const dirX = right ? 1 : -1;
+            const dirY = up ? -1 : 1;
+
+            const q = height / 4;
+            const w = Math.min(q, maxW);
+
+            return (
+                svgPaths.lineOnAxis("h",  w * dirX * 2) +
+                svgPaths.lineTo(-w * dirX,  q * dirY) +
+                svgPaths.lineOnAxis("v",  q * dirY) +
+                svgPaths.lineOnAxis("v",  remainingHeight * dirY) +
+                svgPaths.lineOnAxis("v",  q * dirY) +
+                svgPaths.lineTo(w * dirX, q * dirY) +
+                svgPaths.lineOnAxis("h", -w * dirX * 2)
+            );
+        }
+
+        return {
+            type: this.SHAPES.ROUND,
+            isDynamic: true,
+            width(height) {
+                const q = height / 4;
+                return q > maxW ? maxW : q;
+            },
+            height(height)            { return height; },
+            connectionOffsetY(height) { return height / 2; },
+            connectionOffsetX(width)  { return -width; },
+            pathDown(height)          { return makeMainPath(height, false, false); },
+            pathUp(height)            { return makeMainPath(height, true,  false); },
+            pathRightDown(height)     { return makeMainPath(height, false, true);  },
+            pathRightUp(height)       { return makeMainPath(height, false, true);  },
+        };
     }
 
     makeOctagonal() {
@@ -361,7 +403,7 @@ class CustomConstantProvider extends Blockly.zelos.ConstantProvider {
 class CustomPathObject extends Blockly.zelos.PathObject {
     applyColour(block) {
         super.applyColour(block);
-        if (block.isShadow() && block.canDuplicateOnDrag?.()) {
+        if (block.isShadow() && (block.canDuplicateOnDrag?.())) {
             this.svgPath.setAttribute("fill", block.style.colourPrimary);
             this.svgPath.setAttribute("stroke", block.style.colourTertiary);
         }

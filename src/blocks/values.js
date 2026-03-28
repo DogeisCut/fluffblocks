@@ -4,6 +4,17 @@ import * as BlocklyJS from "blockly/javascript";
 
 Blockly.Blocks["values_number"] = {
     init() {
+        this.setInputsInline(true);
+        this.appendDummyInput()
+            .appendField(new Blockly.FieldNumber(0), "NUMBER");
+        this.setOutput(true, "Number");
+        this.setStyle("values");
+    }
+};
+
+Blockly.Blocks["values_angle"] = { // TODO: Custom Angle Field
+    init() {
+        this.setInputsInline(true);
         this.appendDummyInput()
             .appendField(new Blockly.FieldNumber(0), "NUMBER");
         this.setOutput(true, "Number");
@@ -13,6 +24,7 @@ Blockly.Blocks["values_number"] = {
 
 Blockly.Blocks["values_string"] = {
     init() {
+        this.setInputsInline(true);
         this.appendDummyInput()
             .appendField(new Blockly.FieldTextInput("foo"), "STRING");
         this.setOutput(true, "String");
@@ -30,6 +42,18 @@ Blockly.Blocks["values_any"] = {
         this.setOutput(true);
         this.setStyle("values");
     },
+};
+
+Blockly.Blocks["values_vector"] = { // TODO: custom vector field
+    init() {
+        this.setInputsInline(true);
+        this.appendDummyInput().appendField("x:")
+            .appendField(new Blockly.FieldNumber(0), "X")
+        this.appendDummyInput().appendField("y:")
+            .appendField(new Blockly.FieldNumber(0), "Y");
+        this.setOutput(true, "Vector");
+        this.setStyle("values");
+    }
 };
 
 
@@ -51,6 +75,13 @@ BlocklyJS.javascriptGenerator.forBlock["values_any"] = function (block, generato
     var raw = block.getFieldValue('ANY').trim();
     return [parseValue(raw), BlocklyJS.Order.ATOMIC];
 };
+
+BlocklyJS.javascriptGenerator.forBlock["values_vector"] = function (block, generator) {
+    const X = block.getFieldValue("X");
+    const Y = block.getFieldValue("Y");
+    return [`new Vector(${X}, ${Y})`, BlocklyJS.Order.NONE];
+};
+
 
 
 
