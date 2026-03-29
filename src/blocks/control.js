@@ -258,21 +258,25 @@ Blockly.Blocks["control_switch"] = {
         this.caseCount_ = 0;
         this.defaultCount_ = 0;
         
-        var valueConnections = [null];
-        var statementConnections = [null];
+        var valueConnections = [];
+        var statementConnections = [];
+        var shadowValues = [];
         var defaultStatementConnection = null;
 
-        this.cases_ = []
-        this.default_ = false
+        this.cases_ = [];
+        this.default_ = false;
+        
         while (clauseBlock && !clauseBlock.isInsertionMarker()) {
             switch (clauseBlock.type) {
                 case 'control_switch_mutator_case':
-                    this.cases_.push(clauseBlock.getFieldValue("EMPTY") === 'TRUE')
+                    this.cases_.push(clauseBlock.getFieldValue("EMPTY") === 'TRUE');
                     valueConnections.push(clauseBlock.valueConnection_);
                     statementConnections.push(clauseBlock.statementConnection_);
+                    
+                    shadowValues.push(clauseBlock.savedShadowValue_ !== undefined ? clauseBlock.savedShadowValue_ : null);
                     break;
                 case 'control_switch_mutator_default':
-                    this.default_ = true
+                    this.default_ = true;
                     defaultStatementConnection = clauseBlock.statementConnection_;
                     break;
             }
@@ -280,19 +284,31 @@ Blockly.Blocks["control_switch"] = {
         }
         
         this.updateShape_();
-        this.reconnectChildBlocks_(valueConnections, statementConnections, defaultStatementConnection);
+        
+        this.reconnectChildBlocks_(valueConnections, statementConnections, defaultStatementConnection, shadowValues);
     },
 
     saveConnections: function (containerBlock) {
         var clauseBlock = containerBlock.getInputTargetBlock('DO');
-        var i = 1;
+        var i = 0;
+        
         while (clauseBlock) {
             switch (clauseBlock.type) {
                 case 'control_switch_mutator_case':
                     var inputCase = this.getInput('CASE' + i);
                     var inputDo = this.getInput('DO' + i);
+                    
                     clauseBlock.valueConnection_ = inputCase && inputCase.connection.targetConnection;
                     clauseBlock.statementConnection_ = inputDo && inputDo.connection.targetConnection;
+                    
+                    if (inputCase) {
+                        var targetBlock = inputCase.connection.targetBlock();
+                        if (targetBlock && targetBlock.isShadow()) {
+                            clauseBlock.savedShadowValue_ = targetBlock.getFieldValue('ANY');
+                        } else {
+                            clauseBlock.savedShadowValue_ = null;
+                        }
+                    }
                     i++;
                     break;
                 case 'control_switch_mutator_default':
@@ -304,7 +320,7 @@ Blockly.Blocks["control_switch"] = {
         }
     },
 
-    updateShape_: function () { // TODO: fix inner blocks getting kicked out/shadows clearing fields every time the mutator merely updates
+    updateShape_: function () {
         this.removeInput('DEFAULT_BREAK', true);
         this.removeInput('DEFAULT_LABEL', true);
         this.removeInput('DEFAULT', true);
@@ -336,25 +352,34 @@ Blockly.Blocks["control_switch"] = {
         }
     },
 
-    reconnectChildBlocks_: function (valueConnections, statementConnections, defaultStatementConnection) {
-        // todo: fix this
-        for (var i = 0; i <= this.cases_.length; i++) {
-            if (valueConnections[i]) {
-                var target = this.getInput('CASE' + i)?.connection.targetBlock();
-                if (target && !target.isShadow()) {
-                    this.getInput('CASE' + i)?.connection.connect(valueConnections[i]);
+    reconnectChildBlocks_: function (valueConnections, statementConnections, defaultStatementConnection, shadowValues) {
+        for (var i = 0; i < this.cases_.length; i++) {
+            var input = this.getInput('CASE' + i);
+            if (input) {
+                var conn = valueConnections[i];
+                if (conn && conn.getSourceBlock() && !conn.getSourceBlock().isShadow()) {
+                    input.connection.connect(conn);
+                } 
+                else if (shadowValues && shadowValues[i] !== null) {
+                    var shadowBlock = input.connection.targetBlock();
+                    if (shadowBlock && shadowBlock.isShadow()) {
+                        shadowBlock.setFieldValue(shadowValues[i], 'ANY');
+                    }
                 }
-            }
-            if (statementConnections[i]) this.getInput('DO' + i)?.connection.connect(statementConnections[i]);
         }
-        // this works at least... well unless you change the dropdown
+            
+            if (statementConnections[i]) {
+                this.getInput('DO' + i)?.connection.connect(statementConnections[i]);
+            }
+        }
+        
         if (defaultStatementConnection) {
             this.getInput('DEFAULT')?.connection.connect(defaultStatementConnection);
         }
     }
 };
 
-Blockly.Blocks["control_break"] = {
+Blockly.Blocks["control_break"] = { // TODO: custom connection stuff or whatever to prevent break going where it shouldn't
     init: function () {
         this.setInputsInline(true);
         this.appendDummyInput().appendField("break").appendField(
