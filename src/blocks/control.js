@@ -26,7 +26,9 @@ Blockly.Blocks["control_if_mutator_else"] = {
         this.setStyle("control_blocks");
     },
 };
-Blockly.Blocks["control_if"] = { // TODO: replace "else count" with a boolean (why did i make it a count in the first place??)
+Blockly.Blocks["control_if"] = {
+    // TODO: replace "else count" with a boolean (why did i make it a count in the first place??)
+    // TODO: shadow boolean checkbox
     init: function () {
         this.setStyle("control_blocks");
         this.appendValueInput("IF0")

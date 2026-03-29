@@ -143,6 +143,8 @@ Blockly.Blocks["labeling_label"] = {
 
         // TODO: fix undo
         // TODO: make block hover preview show result
+        // TODO: make input keep block shape if theres a block in it
+        // TODO: make input inherit shadow of the block it's put on
     },
 };
 

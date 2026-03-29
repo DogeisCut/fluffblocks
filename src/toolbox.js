@@ -23,7 +23,7 @@ function shadowVector(x = 0, y = 0) {
     return `<shadow type="values_vector"><field name="X">${x}</field><field name="Y">${y}</field></shadow>`;
     //return `<shadow type="vectors_vector_x_y">${value('X', shadowNumber(x))}${value('Y', shadowNumber(y))}</shadow>`;
 }
-function shadowSTRING(value = "") {
+function shadowString(value = "") {
     return `<shadow type="values_string"><field name="STRING">${value}</field></shadow>`;
 }
 const toolbox = `
@@ -32,7 +32,7 @@ const toolbox = `
     </category>
 
     <category name="Control" colour="#D27654">
-        ${block("control_if")}
+        ${block("control_if", value('IF0', shadowBoolean()))}
         ${block("control_switch", value('ANY', shadowAny()))}
     </category>
 
@@ -46,8 +46,8 @@ const toolbox = `
         ${sep(50)}
         ${block("booleans_any_to_boolean", value('ANY', shadowAny("false")))}
         ${sep(50)}
-        ${block("booleans_binary_logic")}
-        ${block("booleans_not")}
+        ${block("booleans_binary_logic", value('A', shadowBoolean()), value('B', shadowBoolean()))}
+        ${block("booleans_not", value('BOOLEAN', shadowBoolean()))}
     </category>
 
     <category name="Numbers" colour="#D4E05A">

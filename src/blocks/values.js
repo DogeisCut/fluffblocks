@@ -2,7 +2,7 @@ import * as Blockly from "blockly";
 import * as BlocklyJS from "blockly/javascript";
 // internal category
 
-Blockly.Blocks["values_boolean"] = {
+Blockly.Blocks["values_boolean"] = { // TODO: custom checkbox field... this one doesnt interface with shadowed blocks and seems to have a minimum height
     init() {
         this.setInputsInline(true);
         this.appendDummyInput()

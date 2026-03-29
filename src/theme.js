@@ -69,6 +69,8 @@ const blockStyles = {
     },
     values: {
         colourPrimary: "#ffffff",
+        colourSecondary: "#ffffff",
+        colourTertiary:'#ffffff'
     },
 };
 
