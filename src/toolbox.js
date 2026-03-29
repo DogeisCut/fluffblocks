@@ -26,13 +26,14 @@ function shadowVector(x = 0, y = 0) {
 function shadowSTRING(value = "") {
     return `<shadow type="values_string"><field name="STRING">${value}</field></shadow>`;
 }
-
 const toolbox = `
     <category name="Events" colour="#CC5252">
         ${block("events_on_start")}
     </category>
 
     <category name="Control" colour="#D27654">
+        ${block("control_if")}
+        ${block("control_switch", value('ANY', shadowAny()))}
     </category>
 
     <category name="Input" colour="#D79D56">
@@ -75,7 +76,7 @@ const toolbox = `
     </category>
 
     <category name="Arrays" colour="#5EEB77">
-        ${block("arrays_array")}
+        ${block("arrays_array", '<mutation nextid="1"><item id="ITEM0"></item></mutation>')}
         ${sep(50)}
         ${block("arrays_array_builder")}
         ${block("arrays_append_value_to_builder", value('ANY', shadowAny('foo')))}

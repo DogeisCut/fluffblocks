@@ -26,13 +26,13 @@ Blockly.Blocks["arrays_array_mutator_item"] = {
 // TODO: make shadowed blocks save the values typed in them too
 Blockly.Blocks['arrays_array'] = {
     init: function () {
-        this.itemCount_ = 1;
+        this.itemCount_ = 0;
         this.nextId_ = 0;
         this.setInputsInline(true);
         this.appendDummyInput().appendField('array');
         this.setOutput(true, 'Array');
         this.setStyle('arrays_blocks');
-        this.updateShape_([this.newItemId_()]);
+        this.updateShape_([]);
         this.setMutator(new Blockly.icons.MutatorIcon(['arrays_array_mutator_item'], this));
     },
 
@@ -55,7 +55,6 @@ Blockly.Blocks['arrays_array'] = {
         this.nextId_ = parseInt(xmlElement.getAttribute('nextid') || '0', 10);
         var ids = Array.from(xmlElement.querySelectorAll('item'))
             .map(el => el.getAttribute('id'));
-        if (ids.length === 0) ids = [this.newItemId_()];
         this.itemCount_ = ids.length;
         this.updateShape_(ids);
     },

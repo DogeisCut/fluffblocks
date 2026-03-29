@@ -20,8 +20,6 @@ Object.keys(javascriptGenerator.forBlock).forEach(key => delete javascriptGenera
 const context = require.context('./blocks', false, /\.js$/);
 context.keys().forEach(context);
 
-window.Blockly = Blockly
-
 const codeDiv = document.getElementById('generatedCode').firstChild;
 const outputDiv = document.getElementById('output');
 const blocklyDiv = document.getElementById('blocklyDiv');
@@ -123,3 +121,7 @@ ws.addChangeListener((e) => {
 	}
 	compile();
 });
+
+window.Blockly = Blockly
+window.Workspace = ws
+//window.Vector = Vector

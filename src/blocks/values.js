@@ -42,7 +42,7 @@ Blockly.Blocks["values_string"] = {
     }
 };
 
-Blockly.Blocks["values_any"] = {
+Blockly.Blocks["values_any"] = { // TODO: custom field that lets you select a type
     init: function () {
         this.setInputsInline(true);
         this.appendDummyInput().appendField(
