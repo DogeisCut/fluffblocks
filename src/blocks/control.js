@@ -62,7 +62,7 @@ Blockly.Blocks["control_if"] = {
         containerBlock.initSvg();
         let connection = containerBlock.getInput('DO').connection;
 
-        for (var i = 1; i <= this.elseifCount_; i++) {
+        for (let i = 1; i <= this.elseifCount_; i++) {
             const elseifBlock = workspace.newBlock('control_if_mutator_else_if');
             elseifBlock.initSvg();
             connection.connect(elseifBlock.previousConnection);
@@ -160,10 +160,10 @@ Blockly.Blocks["control_if"] = {
             const valInput = this.appendValueInput('IF' + i)
                 .setCheck('Boolean')
                 .appendField('else if');
-            const shadowDom = Blockly.utils.xml.textToDom(
-                `<shadow type="values_boolean"></shadow>`
-            );
-            valInput.connection.setShadowDom(shadowDom);
+            const shadow = this.workspace.newBlock('values_boolean')
+            shadow.setShadow(true)
+            shadow.initSvg();
+            valInput.connection.connect(shadow.outputConnection);
             this.appendStatementInput('DO' + i)
         }
         if (this.else_) {
@@ -178,7 +178,14 @@ Blockly.Blocks["control_if"] = {
             const doInput = this.getInput('DO' + i);
 
             if (ifInput) {
-                const valueConnection = valueConnections[i-1];
+                const valueConnection = valueConnections[i - 1];
+                if (shadowValues && shadowValues[i - 1] !== null) {
+                    const shadow = this.workspace.newBlock('values_boolean')
+                    shadow.setFieldValue(shadowValues[i - 1] ? 'TRUE' : 'FALSE', 'BOOLEAN')
+                    shadow.setShadow(true)
+                    shadow.initSvg();
+                    ifInput.connection.connect(shadow.outputConnection);
+                }
                 if (valueConnection &&
                 valueConnection.getSourceBlock() &&
                 !valueConnection.getSourceBlock().isShadow() &&
@@ -186,12 +193,6 @@ Blockly.Blocks["control_if"] = {
                 !valueConnection.isConnected()) {
                     ifInput.connection.connect(valueConnection);
                 } 
-                if (shadowValues && shadowValues[i-1] !== null) {
-                    const shadowDom = Blockly.utils.xml.textToDom(
-                        `<shadow type="values_boolean"><field name="BOOLEAN">${shadowValues[i-1] ? 'TRUE' : 'FALSE'}</field></shadow>`
-                    );
-                    ifInput.connection.setShadowDom(shadowDom);
-                }
             }
 
             if (doInput) {
@@ -406,17 +407,20 @@ Blockly.Blocks["control_switch"] = {
 
         i = 0;
         (this.cases_ || []).forEach(empty => {
-            const valInput = this.appendValueInput('CASE' + i).appendField('case');
-            const shadowDom = Blockly.utils.xml.textToDom(
-                `<shadow type="values_any"></shadow>`
-            );
-            valInput.connection.setShadowDom(shadowDom);
+            const caseInput = this.appendValueInput('CASE' + i).appendField('case');
+
+            const caseShadow = this.workspace.newBlock('values_boolean')
+            caseShadow.setShadow(true)
+            caseShadow.initSvg();
+            caseInput.connection.connect(caseShadow.outputConnection);
+
             if (!empty) {
                 const doInput = this.appendStatementInput('DO' + i)
-                const doShadowDom = Blockly.utils.xml.textToDom(
-                    `<shadow type="control_break"></shadow>`
-                );
-                doInput.connection.setShadowDom(doShadowDom);
+
+                const doShadow = this.workspace.newBlock('control_break')
+                doShadow.setShadow(true)
+                doShadow.initSvg();
+                doInput.connection.connect(doShadow.previousConnection);
             }
             i++;
         });
@@ -424,10 +428,11 @@ Blockly.Blocks["control_switch"] = {
         if (this.default_) {
             this.appendDummyInput('DEFAULT_LABEL').appendField('default');
             const defaultInput = this.appendStatementInput('DEFAULT');
-            const defaultShadowDom = Blockly.utils.xml.textToDom( // might as well
-                `<shadow type="control_break"></shadow>`
-            );
-            defaultInput.connection.setShadowDom(defaultShadowDom);
+
+            const defaultShadow = this.workspace.newBlock('control_break')
+            defaultShadow.setShadow(true)
+            defaultShadow.initSvg();
+            defaultInput.connection.connect(defaultShadow.previousConnection);
         }
     },
 
@@ -446,10 +451,11 @@ Blockly.Blocks["control_switch"] = {
                     caseInput.connection.connect(valueConnection);
                 } 
                 if (shadowValues && shadowValues[i] !== null) {
-                    const shadowDom = Blockly.utils.xml.textToDom(
-                        `<shadow type="values_any"><field name="ANY">${shadowValues[i]}</field></shadow>`
-                    );
-                    caseInput.connection.setShadowDom(shadowDom);
+                    const caseShadow = this.workspace.newBlock('values_boolean')
+                    caseShadow.setFieldValue(shadowValues[i], 'ANY')
+                    caseShadow.setShadow(true)
+                    caseShadow.initSvg();
+                    caseInput.connection.connect(caseShadow.outputConnection);
                 }
             }
             

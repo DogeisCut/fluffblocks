@@ -34,7 +34,7 @@ Blockly.Blocks["labeling_placeholder"] = {
     },
 
     mutationToDom: function () {
-        var container = Blockly.utils.xml.createElement('mutation');
+        const container = Blockly.utils.xml.createElement('mutation');
         container.setAttribute('mode', this.mode_);
         return container;
     },
@@ -112,7 +112,7 @@ Blockly.Blocks["labeling_label"] = {
     },
 
     mutationToDom: function () {
-        var container = Blockly.utils.xml.createElement('mutation');
+        const container = Blockly.utils.xml.createElement('mutation');
         container.setAttribute('mode', this.mode_);
         return container;
     },

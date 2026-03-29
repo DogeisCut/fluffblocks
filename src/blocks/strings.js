@@ -49,9 +49,9 @@ Blockly.Blocks["strings_join"] = { // like array block, has two inner blocks, on
     },
 
     mutationToDom: function () {
-        var container = Blockly.utils.xml.createElement('mutation');
+        const container = Blockly.utils.xml.createElement('mutation');
         (this.items_ || []).forEach(type => {
-            var itemElement = Blockly.utils.xml.createElement(type);
+            const itemElement = Blockly.utils.xml.createElement(type);
             container.appendChild(itemElement);
         });
         return container;
@@ -63,9 +63,9 @@ Blockly.Blocks["strings_join"] = { // like array block, has two inner blocks, on
     },
 
     decompose: function (workspace) {
-        var containerBlock = workspace.newBlock('strings_join_mutator_join');
+        const containerBlock = workspace.newBlock('strings_join_mutator_join');
         containerBlock.initSvg();
-        var connection = containerBlock.getInput('DO').connection;
+        let connection = containerBlock.getInput('DO').connection;
 
         return containerBlock;
     },

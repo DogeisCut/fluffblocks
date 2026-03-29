@@ -86,7 +86,7 @@ BlocklyJS.javascriptGenerator.forBlock["values_string"] = function(block) {
 };
 
 BlocklyJS.javascriptGenerator.forBlock["values_any"] = function (block, generator) {
-    var raw = block.getFieldValue('ANY').trim();
+    const raw = block.getFieldValue('ANY').trim();
     return [parseValue(raw), BlocklyJS.Order.ATOMIC];
 };
 

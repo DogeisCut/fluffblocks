@@ -34,7 +34,7 @@ Blockly.Blocks['arrays_create_array'] = {
     },
 
     mutationToDom: function () {
-        var container = Blockly.utils.xml.createElement('mutation');
+        const container = Blockly.utils.xml.createElement('mutation');
         container.setAttribute('items', this.itemCount_);
         return container;
     },
@@ -45,12 +45,12 @@ Blockly.Blocks['arrays_create_array'] = {
     },
 
     decompose: function (workspace) {
-        var containerBlock = workspace.newBlock('arrays_array_mutator_items');
+        const containerBlock = workspace.newBlock('arrays_array_mutator_items');
         containerBlock.initSvg();
-        var connection = containerBlock.getInput('DO').connection;
+        let connection = containerBlock.getInput('DO').connection;
 
-        for (var i = 0; i < this.itemCount_; i++) {
-            var itemBlock = workspace.newBlock('arrays_array_mutator_item');
+        for (let i = 0; i < this.itemCount_; i++) {
+            const itemBlock = workspace.newBlock('arrays_array_mutator_item');
             itemBlock.initSvg();
             connection.connect(itemBlock.previousConnection);
             connection = itemBlock.nextConnection;
@@ -59,9 +59,9 @@ Blockly.Blocks['arrays_create_array'] = {
     },
 
     compose: function (containerBlock) {
-        var itemBlock = containerBlock.getInputTargetBlock('DO');
-        var connections = [];
-        var shadowValues = [];
+        let itemBlock = containerBlock.getInputTargetBlock('DO');
+        const connections = [];
+        const shadowValues = [];
 
         while (itemBlock && !itemBlock.isInsertionMarker()) {
             connections.push(itemBlock.valueConnection_);
@@ -75,14 +75,14 @@ Blockly.Blocks['arrays_create_array'] = {
     },
 
     saveConnections: function (containerBlock) {
-        var itemBlock = containerBlock.getInputTargetBlock('DO');
-        var i = 0;
+        let itemBlock = containerBlock.getInputTargetBlock('DO');
+        let i = 0;
         while (itemBlock) {
-            var input = this.getInput('ADD' + i);
+            const input = this.getInput('ADD' + i);
             if (input) {
                 itemBlock.valueConnection_ = input.connection.targetConnection;
                 
-                var shadowState = input.connection.getShadowState(true);
+                const shadowState = input.connection.getShadowState(true);
                 itemBlock.savedShadowValue_ = shadowState?.fields?.ANY || null;
             }
             itemBlock = itemBlock.nextConnection && itemBlock.nextConnection.targetBlock();
@@ -91,40 +91,41 @@ Blockly.Blocks['arrays_create_array'] = {
     },
 
     updateShape_: function () {
-        var i = 0;
+        let i = 0;
         while (this.getInput('ADD' + i)) {
             this.removeInput('ADD' + i);
             i++;
         }
 
-        for (var i = 0; i < this.itemCount_; i++) {
-            var input = this.appendValueInput('ADD' + i);
+        for (let i = 0; i < this.itemCount_; i++) {
+            const input = this.appendValueInput('ADD' + i);
             // if (i === 0) { // not sure i like the way this looks
             //     input.appendField('with');
             // }
-            
-            var shadowDom = Blockly.utils.xml.textToDom(
-                '<shadow type="values_any"></shadow>'
-            );
-            input.connection.setShadowDom(shadowDom);
+
+            const shadow = this.workspace.newBlock('values_any')
+            shadow.setShadow(true)
+            shadow.initSvg();
+            input.connection.connect(shadow.outputConnection);
         }
     },
 
     reconnectChildBlocks_: function (connections, shadowValues) {
-        for (var i = 0; i < this.itemCount_; i++) {
-            var input = this.getInput('ADD' + i);
+        for (let i = 0; i < this.itemCount_; i++) {
+            const input = this.getInput('ADD' + i);
             if (!input) continue;
 
-            var connection = connections[i];
-            if (connection && connection.getSourceBlock() && !connection.getSourceBlock().disposed) {
-                input.connection.connect(connection);
+            if (shadowValues[i] !== null) {
+                const shadow = this.workspace.newBlock('values_any')
+                shadow.setFieldValue(shadowValues[i], 'ANY')
+                shadow.setShadow(true)
+                shadow.initSvg();
+                input.connection.connect(shadow.outputConnection);
             }
 
-            if (shadowValues[i] !== null) {
-                var shadowDom = Blockly.utils.xml.textToDom(
-                    `<shadow type="values_any"><field name="ANY">${shadowValues[i]}</field></shadow>`
-                );
-                input.connection.setShadowDom(shadowDom);
+            const connection = connections[i];
+            if (connection && connection.getSourceBlock() && !connection.getSourceBlock().disposed) {
+                input.connection.connect(connection);
             }
         }
     }
@@ -154,13 +155,13 @@ Blockly.Blocks["arrays_append_value_to_builder"] = { // todo: warning when not i
 
 
 BlocklyJS.javascriptGenerator.forBlock["arrays_array"] = function (block, generator) {
-    var items = [];
+    const items = [];
     
-    for (var i = 0; i < block.itemCount_; i++) {
-        var valueCode = generator.valueToCode(block, 'ADD' + i, BlocklyJS.Order.NONE) || 'null';
+    for (let i = 0; i < block.itemCount_; i++) {
+        const valueCode = generator.valueToCode(block, 'ADD' + i, BlocklyJS.Order.NONE) || 'null';
         items.push(valueCode);
     }
 
-    var code = '[' + items.join(', ') + ']';
+    const code = '[' + items.join(', ') + ']';
     return [code, BlocklyJS.Order.ATOMIC];
 };
