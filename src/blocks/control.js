@@ -187,11 +187,37 @@ Blockly.Blocks["control_switch_mutator_case"] = {
     init: function () {
         this.setInputsInline(true);
         this.appendDummyInput().appendField("case");
-        this.appendDummyInput().appendField("empty?:").appendField(new Blockly.FieldCheckbox("FALSE"), "EMPTY");
+        this.appendDummyInput("EMPTY_ROW")
+            .appendField("empty?:")
+            .appendField(new Blockly.FieldCheckbox('FALSE'), "EMPTY");
         this.setPreviousStatement(true, "default");
         this.setNextStatement(true, "default");
         this.setStyle("control_blocks");
     },
+
+    onchange: function (event) {
+        const nextBlock = this.nextConnection && this.nextConnection.targetBlock();
+        const hasBlockBelow = nextBlock && !nextBlock.isInsertionMarker();
+
+        const prevBlock = this.previousConnection && this.previousConnection.targetBlock();
+        const hasBlockAbove = prevBlock && !prevBlock.isInsertionMarker();
+
+        const isLastInStack = hasBlockAbove && !hasBlockBelow;
+
+        const emptyInput = this.getInput("EMPTY_ROW");
+
+        if (emptyInput) {
+            if (emptyInput.isVisible() === isLastInStack) {
+                emptyInput.setVisible(!isLastInStack);
+                
+                if (isLastInStack) {
+                    this.setFieldValue('FALSE', 'EMPTY');
+                }
+
+                this.queueRender();
+            }
+        }
+    }
 };
 Blockly.Blocks["control_switch_mutator_default"] = {
     init: function () {
@@ -352,7 +378,11 @@ Blockly.Blocks["control_switch"] = {
 
         if (this.default_) {
             this.appendDummyInput('DEFAULT_LABEL').appendField('default');
-            this.appendStatementInput('DEFAULT');
+            const defaultInput = this.appendStatementInput('DEFAULT');
+            var defaultShadowDom = Blockly.utils.xml.textToDom( // might as well
+                `<shadow type="control_break"></shadow>`
+            );
+            defaultInput.connection.setShadowDom(defaultShadowDom);
         }
     },
 
@@ -379,6 +409,7 @@ Blockly.Blocks["control_switch"] = {
             
             if (doInput && statementConnections[i]) {
                 if (statementConnections[i].getSourceBlock() &&
+                !statementConnections[i].getSourceBlock().isShadow() &&
                 !statementConnections[i].getSourceBlock().disposed &&
                 !statementConnections[i].isConnected()) {
                     doInput.connection.connect(statementConnections[i]);
@@ -386,7 +417,12 @@ Blockly.Blocks["control_switch"] = {
             }
         }
         
-        if (defaultStatementConnection && this.getInput('DEFAULT')) {
+        if (defaultStatementConnection &&
+        defaultStatementConnection.getSourceBlock() &&
+        !defaultStatementConnection.getSourceBlock().disposed &&
+        !defaultStatementConnection.getSourceBlock().isShadow() &&
+        !defaultStatementConnection.isConnected() &&
+        this.getInput('DEFAULT')) {
             this.getInput('DEFAULT')?.connection.connect(defaultStatementConnection);
         }
     }

@@ -72,12 +72,13 @@ const toolbox = `
     <category name="Numbers" colour="#D4E05A">
         ${block("values_number")}
         ${sep(50)}
-        ${block("number_any_to_number", value('ANY', shadowAny("10")))}
+        ${block("number_unary_operation", value('ANY', shadowAny("10")))}
     </category>
 
     <category name="Strings" colour="#B2E45B">
         ${block("values_string")}
         ${sep(50)}
+        ${block("strings_any_to_string", value('ANY', shadowAny("10")))}
     </category>
 
     <category name="Color" colour="#8FE75C">

@@ -5,7 +5,6 @@ Blockly.Blocks["booleans_any_to_boolean"] = {
     init: function () {
         this.setInputsInline(true);
         this.appendValueInput("ANY");
-        this.appendDummyInput().appendField("to boolean");
         this.setOutput(true, "Boolean");
         this.setStyle("booleans_blocks");
     },
@@ -75,6 +74,6 @@ BlocklyJS.javascriptGenerator.forBlock["booleans_binary_logic"] = function (bloc
         case 'xnor':
             return [`!${A} != !${B}`, BlocklyJS.Order.NONE]
         default:
-            return [`${A} || ${B}`, BlocklyJS.Order.NONE]
+            throw TypeError('Unknown booleans binary logic type: ' + MENU);
     }
 };
