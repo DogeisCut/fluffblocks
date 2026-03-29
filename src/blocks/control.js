@@ -409,7 +409,7 @@ Blockly.Blocks["control_switch"] = {
         (this.cases_ || []).forEach(empty => {
             const caseInput = this.appendValueInput('CASE' + i).appendField('case');
 
-            const caseShadow = this.workspace.newBlock('values_boolean')
+            const caseShadow = this.workspace.newBlock('values_any')
             caseShadow.setShadow(true)
             caseShadow.initSvg();
             caseInput.connection.connect(caseShadow.outputConnection);
@@ -443,6 +443,13 @@ Blockly.Blocks["control_switch"] = {
 
             if (caseInput) {
                 const valueConnection = valueConnections[i];
+                if (shadowValues && shadowValues[i] !== null) {
+                    const caseShadow = this.workspace.newBlock('values_any')
+                    caseShadow.setFieldValue(shadowValues[i], 'ANY')
+                    caseShadow.setShadow(true)
+                    caseShadow.initSvg();
+                    caseInput.connection.connect(caseShadow.outputConnection);
+                }
                 if (valueConnection &&
                 valueConnection.getSourceBlock() &&
                 !valueConnection.getSourceBlock().disposed &&
@@ -450,13 +457,6 @@ Blockly.Blocks["control_switch"] = {
                 !valueConnection.isConnected()) {
                     caseInput.connection.connect(valueConnection);
                 } 
-                if (shadowValues && shadowValues[i] !== null) {
-                    const caseShadow = this.workspace.newBlock('values_boolean')
-                    caseShadow.setFieldValue(shadowValues[i], 'ANY')
-                    caseShadow.setShadow(true)
-                    caseShadow.initSvg();
-                    caseInput.connection.connect(caseShadow.outputConnection);
-                }
             }
             
             if (doInput) {
