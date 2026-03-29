@@ -33,7 +33,26 @@ const toolbox = `
 
     <category name="Control" colour="#D27654">
         ${block("control_if", value('IF0', shadowBoolean()))}
-        ${block("control_switch", value('ANY', shadowAny()))}
+        <block type="control_switch">
+            <mutation default="FALSE">
+                <case empty="FALSE"></case>
+            </mutation>
+            <value name="ANY">
+                <shadow type="values_any">
+                    <field name="ANY"></field>
+                </shadow>
+            </value>
+            <value name="CASE0">
+                <shadow type="values_any">
+                    <field name="ANY"></field>
+                </shadow>
+            </value>
+            <statement name="DO0">
+                <block type="control_break"></block>
+            </statement>
+        </block>
+        ${sep(50)}
+        ${block("control_break")}
     </category>
 
     <category name="Input" colour="#D79D56">

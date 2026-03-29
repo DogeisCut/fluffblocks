@@ -185,14 +185,8 @@ Blockly.Blocks["control_switch_mutator_switch"] = {
 Blockly.Blocks["control_switch_mutator_case"] = {
     init: function () {
         this.setInputsInline(true);
-        this.appendDummyInput().appendField("case")
-        this.appendDummyInput().appendField(new Blockly.FieldDropdown([
-                ["break", "break"],
-                ["passthrough", "passthrough"],
-                ["empty", "empty"],
-            ]),
-            "TYPE"
-        )
+        this.appendDummyInput().appendField("case");
+        this.appendDummyInput().appendField("empty?:").appendField(new Blockly.FieldCheckbox("FALSE"), "EMPTY");
         this.setPreviousStatement(true, "default");
         this.setNextStatement(true, "default");
         this.setStyle("control_blocks");
@@ -201,20 +195,14 @@ Blockly.Blocks["control_switch_mutator_case"] = {
 Blockly.Blocks["control_switch_mutator_default"] = {
     init: function () {
         this.setInputsInline(true);
-        this.appendDummyInput().appendField("default")
-        this.appendDummyInput().appendField(new Blockly.FieldDropdown([
-                ["break", "break"],
-                ["passthrough", "passthrough"],
-                ["empty", "empty"],
-            ]),
-            "TYPE"
-        )
+        this.appendDummyInput().appendField("default");
         this.setPreviousStatement(true, "default");
         this.setStyle("control_blocks");
     },
 };
 Blockly.Blocks["control_switch"] = {
     init: function () {
+        this.setInputsInline(false);
         this.setStyle("control_blocks");
         this.appendValueInput("ANY")
             .appendField("switch");
@@ -222,25 +210,25 @@ Blockly.Blocks["control_switch"] = {
         this.setNextStatement(true);
         this.setMutator(new Blockly.icons.MutatorIcon(['control_switch_mutator_case', 'control_switch_mutator_default'], this));
         this.cases_ = [];
-        this.default_ = 'none';
+        this.default_ = false;
         this.updateShape_();
     },
     
     mutationToDom: function () {
         var container = Blockly.utils.xml.createElement('mutation');
-        (this.cases_ || []).forEach(type => {
+        (this.cases_ || []).forEach(empty => {
             var caseElement = Blockly.utils.xml.createElement('case');
-            caseElement.setAttribute('type', type);
+            caseElement.setAttribute('empty', empty ? 'TRUE' : 'FALSE');
             container.appendChild(caseElement);
         });
-        container.setAttribute('default', this.default_ ?? 'none');
+        container.setAttribute('default', this.default_ ? 'TRUE' : 'FALSE');
         return container;
     },
 
     domToMutation: function (xmlElement) {
-        this.default_ = xmlElement.getAttribute('default') || 'none'
+        this.default_ = xmlElement.getAttribute('default') === 'TRUE'
         this.cases_ = Array.from(xmlElement.querySelectorAll('case'))
-            .map(el => el.getAttribute('type'));
+            .map(el => el.getAttribute('empty')  === 'TRUE');
         this.updateShape_();
     },
 
@@ -249,17 +237,16 @@ Blockly.Blocks["control_switch"] = {
         containerBlock.initSvg();
         var connection = containerBlock.getInput('DO').connection;
 
-        (this.cases_ || []).forEach(type => {
+        (this.cases_ || []).forEach(empty => {
             var caseBlock = workspace.newBlock('control_switch_mutator_case');
-            caseBlock.getField("TYPE")?.setValue(type)
+            caseBlock.getField("EMPTY")?.setValue(empty ? 'TRUE' : 'FALSE')
             caseBlock.initSvg();
             connection.connect(caseBlock.previousConnection);
             connection = caseBlock.nextConnection;
         });
 
-        if (this.default_ && this.default_ !== 'none') {
+        if (this.default_) {
             var defaultBlock = workspace.newBlock('control_switch_mutator_default');
-            defaultBlock.getField("TYPE")?.setValue(this.default_)
             defaultBlock.initSvg();
             connection.connect(defaultBlock.previousConnection);
         }
@@ -276,16 +263,16 @@ Blockly.Blocks["control_switch"] = {
         var defaultStatementConnection = null;
 
         this.cases_ = []
-        this.default_ = 'none'
+        this.default_ = false
         while (clauseBlock && !clauseBlock.isInsertionMarker()) {
             switch (clauseBlock.type) {
                 case 'control_switch_mutator_case':
-                    this.cases_.push(clauseBlock.getFieldValue("TYPE"))
+                    this.cases_.push(clauseBlock.getFieldValue("EMPTY") === 'TRUE')
                     valueConnections.push(clauseBlock.valueConnection_);
                     statementConnections.push(clauseBlock.statementConnection_);
                     break;
                 case 'control_switch_mutator_default':
-                    this.default_ = clauseBlock.getFieldValue("TYPE")
+                    this.default_ = true
                     defaultStatementConnection = clauseBlock.statementConnection_;
                     break;
             }
@@ -330,53 +317,22 @@ Blockly.Blocks["control_switch"] = {
         }
 
         var i = 0;
-        (this.cases_ || []).forEach(type => {
+        (this.cases_ || []).forEach(empty => {
             var valInput = this.appendValueInput('CASE' + i).appendField('case');
             var shadowDom = Blockly.utils.xml.textToDom(
                 '<shadow type="values_any"></shadow>'
             );
             valInput.connection.setShadowDom(shadowDom);
-            switch (type) {
-                case 'break':
-                    this.appendStatementInput('DO' + i)
-                    this.appendDummyInput("BREAK" + i).appendField(
-                        new Blockly.FieldImage(
-                            "/icons/arrow-down.svg",
-                            18,
-                            25,
-                            "breaks",
-                        ),
-                    ).setAlign(Blockly.inputs.Align.RIGHT)
-                    break;
-                case 'passthrough':
-                    this.appendStatementInput('DO' + i)
-                    break;
-                case 'empty':
-                    break;
+            if (!empty) {
+                const doInput = this.appendStatementInput('DO' + i)
+                // TODO: maybe automatically add break block?
             }
             i++;
         });
 
-        if (this.default_ && this.default_ !== 'none') {
+        if (this.default_) {
             this.appendDummyInput('DEFAULT_LABEL').appendField('default');
-            switch (this.default_) {
-                case 'break':
-                    this.appendStatementInput('DEFAULT');
-                    this.appendDummyInput("DEFAULT_BREAK").appendField(
-                        new Blockly.FieldImage(
-                            "/icons/arrow-down.svg",
-                            18,
-                            25,
-                            "breaks",
-                        ),
-                    ).setAlign(Blockly.inputs.Align.RIGHT)
-                    break;
-                case 'passthrough':
-                    this.appendStatementInput('DEFAULT');
-                    break;
-                case 'empty':
-                    break;
-            }
+            this.appendStatementInput('DEFAULT');
         }
     },
 
@@ -396,6 +352,22 @@ Blockly.Blocks["control_switch"] = {
             this.getInput('DEFAULT')?.connection.connect(defaultStatementConnection);
         }
     }
+};
+
+Blockly.Blocks["control_break"] = {
+    init: function () {
+        this.setInputsInline(true);
+        this.appendDummyInput().appendField("break").appendField(
+            new Blockly.FieldImage(
+                "/icons/arrow-down.svg",
+                18,
+                25,
+                "breaks",
+            ),
+        ).setAlign(Blockly.inputs.Align.RIGHT)
+        this.setPreviousStatement(true, "default");
+        this.setStyle("control_blocks");
+    },
 };
 
 
@@ -426,4 +398,8 @@ BlocklyJS.javascriptGenerator.forBlock['control_switch'] = function(block, gener
     // im not even gonna bother yet
 
     return '\n';
+};
+
+BlocklyJS.javascriptGenerator.forBlock['control_break'] = function(block, generator) {
+    return 'break;\n';
 };
