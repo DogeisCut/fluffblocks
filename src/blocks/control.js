@@ -40,44 +40,37 @@ Blockly.Blocks["control_if"] = {
         this.setNextStatement(true);
         this.setMutator(new Blockly.icons.MutatorIcon(['control_if_mutator_else_if', 'control_if_mutator_else'], this));
         this.elseifCount_ = 0;
-        this.elseCount_ = 0;
+        this.else_ = false;
         this.updateShape_();
     },
 
     mutationToDom: function () {
-        if (!this.elseifCount_ && !this.elseCount_) {
-            return null;
-        }
-        var container = Blockly.utils.xml.createElement('mutation');
-        if (this.elseifCount_) {
-            container.setAttribute('elseif', this.elseifCount_);
-        }
-        if (this.elseCount_) {
-            container.setAttribute('else', 1);
-        }
+        const container = Blockly.utils.xml.createElement('mutation');
+        container.setAttribute('elseif', this.elseifCount_);
+        container.setAttribute('else', this.else_ ? 'TRUE' : 'FALSE');
         return container;
     },
 
     domToMutation: function (xmlElement) {
         this.elseifCount_ = parseInt(xmlElement.getAttribute('elseif'), 10) || 0;
-        this.elseCount_ = parseInt(xmlElement.getAttribute('else'), 10) || 0;
+        this.else_ = xmlElement.getAttribute('else') === 'TRUE'
         this.updateShape_();
     },
 
     decompose: function (workspace) {
-        var containerBlock = workspace.newBlock('control_if_mutator_if');
+        const containerBlock = workspace.newBlock('control_if_mutator_if');
         containerBlock.initSvg();
-        var connection = containerBlock.getInput('DO').connection;
+        let connection = containerBlock.getInput('DO').connection;
 
         for (var i = 1; i <= this.elseifCount_; i++) {
-            var elseifBlock = workspace.newBlock('control_if_mutator_else_if');
+            const elseifBlock = workspace.newBlock('control_if_mutator_else_if');
             elseifBlock.initSvg();
             connection.connect(elseifBlock.previousConnection);
             connection = elseifBlock.nextConnection;
         }
 
-        if (this.elseCount_) {
-            var elseBlock = workspace.newBlock('control_if_mutator_else');
+        if (this.else_) {
+            const elseBlock = workspace.newBlock('control_if_mutator_else');
             elseBlock.initSvg();
             connection.connect(elseBlock.previousConnection);
         }
@@ -85,12 +78,15 @@ Blockly.Blocks["control_if"] = {
     },
 
     compose: function (containerBlock) {
-        var clauseBlock = containerBlock.getInputTargetBlock('DO');
+        let clauseBlock = containerBlock.getInputTargetBlock('DO');
+
+        const valueConnections = [];
+        const statementConnections = [];
+        const shadowValues = [];
+        let elseStatementConnection = null;
+
         this.elseifCount_ = 0;
-        this.elseCount_ = 0;
-        var valueConnections = [null];
-        var statementConnections = [null];
-        var elseStatementConnection = null;
+        this.else_ = false;
 
         while (clauseBlock && !clauseBlock.isInsertionMarker()) {
             switch (clauseBlock.type) {
@@ -98,79 +94,126 @@ Blockly.Blocks["control_if"] = {
                     this.elseifCount_++;
                     valueConnections.push(clauseBlock.valueConnection_);
                     statementConnections.push(clauseBlock.statementConnection_);
+
+                    shadowValues.push(clauseBlock.savedShadowValue_ !== undefined ? clauseBlock.savedShadowValue_ : null);
                     break;
                 case 'control_if_mutator_else':
-                    this.elseCount_++;
+                    this.else_ = true;
                     elseStatementConnection = clauseBlock.statementConnection_;
                     break;
                 default:
                     throw TypeError('Unknown block type: ' + clauseBlock.type);
             }
-            clauseBlock = clauseBlock.nextConnection &&
-                clauseBlock.nextConnection.targetBlock();
+            clauseBlock = clauseBlock.nextConnection && clauseBlock.nextConnection.targetBlock();
         }
+
         this.updateShape_();
-        this.reconnectChildBlocks_(valueConnections, statementConnections, elseStatementConnection);
+
+        this.reconnectChildBlocks_(valueConnections, statementConnections, elseStatementConnection, shadowValues);
     },
 
     saveConnections: function (containerBlock) {
-        var clauseBlock = containerBlock.getInputTargetBlock('DO');
-        var i = 1;
+        let clauseBlock = containerBlock.getInputTargetBlock('DO');
+        let i = 1;
+
         while (clauseBlock) {
             switch (clauseBlock.type) {
                 case 'control_if_mutator_else_if':
-                    var inputIf = this.getInput('IF' + i);
-                    var inputDo = this.getInput('DO' + i);
-                    clauseBlock.valueConnection_ = inputIf && inputIf.connection.targetConnection;
-                    clauseBlock.statementConnection_ = inputDo && inputDo.connection.targetConnection;
+                    const inputIf = this.getInput('IF' + i);
+                    const inputDo = this.getInput('DO' + i);
+
+                    if (inputIf) {
+                        clauseBlock.valueConnection_ = inputIf.connection.targetConnection;
+
+                        const shadowState = inputIf.connection.getShadowState(true);
+                        clauseBlock.savedShadowValue_ = shadowState?.fields?.BOOLEAN; // no idea why the checkbox field is evil and returns an actual bool here
+                    }
+
+                    if (inputDo) {
+                        clauseBlock.statementConnection_ = inputDo.connection.targetConnection;
+                    }
+
                     i++;
                     break;
                 case 'control_if_mutator_else':
-                    var inputElse = this.getInput('ELSE');
+                    const inputElse = this.getInput('ELSE');
                     clauseBlock.statementConnection_ = inputElse && inputElse.connection.targetConnection;
                     break;
                 default:
                     throw TypeError('Unknown block type: ' + clauseBlock.type);
             }
-            clauseBlock = clauseBlock.nextConnection &&
-                clauseBlock.nextConnection.targetBlock();
+            clauseBlock = clauseBlock.nextConnection && clauseBlock.nextConnection.targetBlock();
         }
     },
 
     updateShape_: function () {
-        if (this.getInput('ELSE')) {
-            this.removeInput('ELSE');
-            this.removeInput('ELSE_LABEL');
-        }
-        var i = 1;
+        this.removeInput('ELSE', true);
+        this.removeInput('ELSE_LABEL', true);
+        let i = 1;
         while (this.getInput('IF' + i)) {
             this.removeInput('IF' + i);
             this.removeInput('DO' + i);
             i++;
         }
+
         for (i = 1; i <= this.elseifCount_; i++) {
-            this.appendValueInput('IF' + i)
+            const valInput = this.appendValueInput('IF' + i)
                 .setCheck('Boolean')
                 .appendField('else if');
+            const shadowDom = Blockly.utils.xml.textToDom(
+                `<shadow type="values_boolean"></shadow>`
+            );
+            valInput.connection.setShadowDom(shadowDom);
             this.appendStatementInput('DO' + i)
         }
-        if (this.elseCount_) {
+        if (this.else_) {
             this.appendDummyInput("ELSE_LABEL").appendField('else');
             this.appendStatementInput('ELSE');
         }
     },
 
-    reconnectChildBlocks_: function (valueConnections, statementConnections, elseStatementConnection) {
-        for (var i = 1; i <= this.elseifCount_; i++) {
-            if (valueConnections[i]) {
-                this.getInput('IF' + i).connection.connect(valueConnections[i]);
+    reconnectChildBlocks_: function (valueConnections, statementConnections, elseStatementConnection, shadowValues) {
+        for (let i = 1; i <= this.elseifCount_; i++) {
+            const ifInput = this.getInput('IF' + i);
+            const doInput = this.getInput('DO' + i);
+
+            if (ifInput) {
+                const valueConnection = valueConnections[i-1];
+                if (valueConnection &&
+                valueConnection.getSourceBlock() &&
+                !valueConnection.getSourceBlock().isShadow() &&
+                !valueConnection.getSourceBlock().disposed &&
+                !valueConnection.isConnected()) {
+                    ifInput.connection.connect(valueConnection);
+                } 
+                if (shadowValues && shadowValues[i-1] !== null) {
+                    const shadowDom = Blockly.utils.xml.textToDom(
+                        `<shadow type="values_boolean"><field name="BOOLEAN">${shadowValues[i-1] ? 'TRUE' : 'FALSE'}</field></shadow>`
+                    );
+                    ifInput.connection.setShadowDom(shadowDom);
+                }
             }
-            if (statementConnections[i]) {
-                this.getInput('DO' + i).connection.connect(statementConnections[i]);
+
+            if (doInput) {
+                const statementConnection = statementConnections[i-1]
+                if (statementConnection &&
+                statementConnection.getSourceBlock() &&
+                !statementConnection.getSourceBlock().disposed &&
+                !statementConnection.getSourceBlock().isShadow() &&
+                !statementConnection.isConnected()) {
+                    doInput.connection.connect(statementConnection);
+                }
             }
         }
-        if (elseStatementConnection) {
-            this.getInput('ELSE').connection.connect(elseStatementConnection);
+
+        if (this.getInput('ELSE')) {
+            if (elseStatementConnection &&
+            elseStatementConnection.getSourceBlock() &&
+            !elseStatementConnection.getSourceBlock().disposed &&
+            !elseStatementConnection.getSourceBlock().isShadow() &&
+            !elseStatementConnection.isConnected()) {
+                this.getInput('ELSE').connection.connect(elseStatementConnection);
+            }
         }
     }
 };
@@ -242,9 +285,9 @@ Blockly.Blocks["control_switch"] = {
     },
     
     mutationToDom: function () {
-        var container = Blockly.utils.xml.createElement('mutation');
+        const container = Blockly.utils.xml.createElement('mutation');
         (this.cases_ || []).forEach(empty => {
-            var caseElement = Blockly.utils.xml.createElement('case');
+            const caseElement = Blockly.utils.xml.createElement('case');
             caseElement.setAttribute('empty', empty ? 'TRUE' : 'FALSE');
             container.appendChild(caseElement);
         });
@@ -260,12 +303,12 @@ Blockly.Blocks["control_switch"] = {
     },
 
     decompose: function (workspace) {
-        var containerBlock = workspace.newBlock('control_switch_mutator_switch');
+        const containerBlock = workspace.newBlock('control_switch_mutator_switch');
         containerBlock.initSvg();
-        var connection = containerBlock.getInput('DO').connection;
+        let connection = containerBlock.getInput('DO').connection;
 
         (this.cases_ || []).forEach(empty => {
-            var caseBlock = workspace.newBlock('control_switch_mutator_case');
+            const caseBlock = workspace.newBlock('control_switch_mutator_case');
             caseBlock.getField("EMPTY")?.setValue(empty ? 'TRUE' : 'FALSE')
             caseBlock.initSvg();
             connection.connect(caseBlock.previousConnection);
@@ -273,7 +316,7 @@ Blockly.Blocks["control_switch"] = {
         });
 
         if (this.default_) {
-            var defaultBlock = workspace.newBlock('control_switch_mutator_default');
+            const defaultBlock = workspace.newBlock('control_switch_mutator_default');
             defaultBlock.initSvg();
             connection.connect(defaultBlock.previousConnection);
         }
@@ -281,14 +324,12 @@ Blockly.Blocks["control_switch"] = {
     },
 
     compose: function (containerBlock) {
-        var clauseBlock = containerBlock.getInputTargetBlock('DO');
-        this.caseCount_ = 0;
-        this.defaultCount_ = 0;
-        
-        var valueConnections = [];
-        var statementConnections = [];
-        var shadowValues = [];
-        var defaultStatementConnection = null;
+        let clauseBlock = containerBlock.getInputTargetBlock('DO');
+
+        const valueConnections = [];
+        const statementConnections = [];
+        const shadowValues = [];
+        let defaultStatementConnection = null;
 
         this.cases_ = [];
         this.default_ = false;
@@ -306,6 +347,8 @@ Blockly.Blocks["control_switch"] = {
                     this.default_ = true;
                     defaultStatementConnection = clauseBlock.statementConnection_;
                     break;
+                default:
+                    throw TypeError('Unknown block type: ' + clauseBlock.type);
             }
             clauseBlock = clauseBlock.nextConnection && clauseBlock.nextConnection.targetBlock();
         }
@@ -316,32 +359,34 @@ Blockly.Blocks["control_switch"] = {
     },
 
     saveConnections: function (containerBlock) {
-        var clauseBlock = containerBlock.getInputTargetBlock('DO');
-        var i = 0;
+        let clauseBlock = containerBlock.getInputTargetBlock('DO');
+        let i = 0;
         
         while (clauseBlock) {
             switch (clauseBlock.type) {
                 case 'control_switch_mutator_case':
-                    var inputCase = this.getInput('CASE' + i);
-                    var inputDo = this.getInput('DO' + i);
+                    const inputCase = this.getInput('CASE' + i);
+                    const inputDo = this.getInput('DO' + i);
                     
                     if (inputCase) {
                         clauseBlock.valueConnection_ = inputCase.connection.targetConnection;
 
-                        var shadowState = inputCase.connection.getShadowState(true);
+                        const shadowState = inputCase.connection.getShadowState(true);
                         clauseBlock.savedShadowValue_ = shadowState?.fields?.ANY || "";
                     }
 
                     if (inputDo) {
-                        clauseBlock.statementConnection_ = inputDo && inputDo.connection.targetConnection;
+                        clauseBlock.statementConnection_ = inputDo.connection.targetConnection;
                     }
 
                     i++;
                     break;
                 case 'control_switch_mutator_default':
-                    var inputDefault = this.getInput('DEFAULT');
+                    const inputDefault = this.getInput('DEFAULT');
                     clauseBlock.statementConnection_ = inputDefault && inputDefault.connection.targetConnection;
                     break;
+                default:
+                    throw TypeError('Unknown block type: ' + clauseBlock.type);
             }
             clauseBlock = clauseBlock.nextConnection && clauseBlock.nextConnection.targetBlock();
         }
@@ -351,7 +396,7 @@ Blockly.Blocks["control_switch"] = {
         this.removeInput('DEFAULT_BREAK', true);
         this.removeInput('DEFAULT_LABEL', true);
         this.removeInput('DEFAULT', true);
-        var i = 0;
+        let i = 0;
         while (this.getInput('CASE' + i)) {
             this.removeInput('BREAK' + i, true);
             this.removeInput('CASE' + i, true);
@@ -359,16 +404,16 @@ Blockly.Blocks["control_switch"] = {
             i++;
         }
 
-        var i = 0;
+        i = 0;
         (this.cases_ || []).forEach(empty => {
-            var valInput = this.appendValueInput('CASE' + i).appendField('case');
-            var shadowDom = Blockly.utils.xml.textToDom(
+            const valInput = this.appendValueInput('CASE' + i).appendField('case');
+            const shadowDom = Blockly.utils.xml.textToDom(
                 `<shadow type="values_any"></shadow>`
             );
             valInput.connection.setShadowDom(shadowDom);
             if (!empty) {
                 const doInput = this.appendStatementInput('DO' + i)
-                var doShadowDom = Blockly.utils.xml.textToDom(
+                const doShadowDom = Blockly.utils.xml.textToDom(
                     `<shadow type="control_break"></shadow>`
                 );
                 doInput.connection.setShadowDom(doShadowDom);
@@ -379,7 +424,7 @@ Blockly.Blocks["control_switch"] = {
         if (this.default_) {
             this.appendDummyInput('DEFAULT_LABEL').appendField('default');
             const defaultInput = this.appendStatementInput('DEFAULT');
-            var defaultShadowDom = Blockly.utils.xml.textToDom( // might as well
+            const defaultShadowDom = Blockly.utils.xml.textToDom( // might as well
                 `<shadow type="control_break"></shadow>`
             );
             defaultInput.connection.setShadowDom(defaultShadowDom);
@@ -387,43 +432,47 @@ Blockly.Blocks["control_switch"] = {
     },
 
     reconnectChildBlocks_: function (valueConnections, statementConnections, defaultStatementConnection, shadowValues) {
-        for (var i = 0; i < this.cases_.length; i++) {
-            var caseInput = this.getInput('CASE' + i);
-            var doInput = this.getInput('DO' + i);
+        for (let i = 0; i < this.cases_.length; i++) {
+            const caseInput = this.getInput('CASE' + i);
+            const doInput = this.getInput('DO' + i);
 
             if (caseInput) {
-                var valueConnection = valueConnections[i];
+                const valueConnection = valueConnections[i];
                 if (valueConnection &&
                 valueConnection.getSourceBlock() &&
+                !valueConnection.getSourceBlock().disposed &&
                 !valueConnection.getSourceBlock().isShadow() &&
                 !valueConnection.isConnected()) {
                     caseInput.connection.connect(valueConnection);
                 } 
                 if (shadowValues && shadowValues[i] !== null) {
-                    var shadowDom = Blockly.utils.xml.textToDom(
+                    const shadowDom = Blockly.utils.xml.textToDom(
                         `<shadow type="values_any"><field name="ANY">${shadowValues[i]}</field></shadow>`
                     );
                     caseInput.connection.setShadowDom(shadowDom);
                 }
             }
             
-            if (doInput && statementConnections[i]) {
-                if (statementConnections[i].getSourceBlock() &&
-                !statementConnections[i].getSourceBlock().isShadow() &&
-                !statementConnections[i].getSourceBlock().disposed &&
-                !statementConnections[i].isConnected()) {
-                    doInput.connection.connect(statementConnections[i]);
+            if (doInput) {
+                const statementConnection = statementConnections[i]
+                if (statementConnection &&
+                statementConnection.getSourceBlock() &&
+                !statementConnection.getSourceBlock().disposed &&
+                !statementConnection.getSourceBlock().isShadow() &&
+                !statementConnection.isConnected()) {
+                    doInput.connection.connect(statementConnection);
                 }
             }
         }
-        
-        if (defaultStatementConnection &&
-        defaultStatementConnection.getSourceBlock() &&
-        !defaultStatementConnection.getSourceBlock().disposed &&
-        !defaultStatementConnection.getSourceBlock().isShadow() &&
-        !defaultStatementConnection.isConnected() &&
-        this.getInput('DEFAULT')) {
-            this.getInput('DEFAULT')?.connection.connect(defaultStatementConnection);
+
+        if (this.getInput('DEFAULT')) {
+            if (defaultStatementConnection &&
+            defaultStatementConnection.getSourceBlock() &&
+            !defaultStatementConnection.getSourceBlock().disposed &&
+            !defaultStatementConnection.getSourceBlock().isShadow() &&
+            !defaultStatementConnection.isConnected()) {
+                this.getInput('DEFAULT').connection.connect(defaultStatementConnection);
+            }
         }
     }
 };
