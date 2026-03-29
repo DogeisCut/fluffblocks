@@ -48,7 +48,7 @@ const toolbox = `
                 </shadow>
             </value>
             <statement name="DO0">
-                <block type="control_break"></block>
+                <shadow type="control_break"></shadow>
             </statement>
         </block>
         ${sep(50)}
@@ -122,6 +122,8 @@ const toolbox = `
         ${sep(50)}
         ${block("utility_binary_operations", value('A', shadowAny()), value('B', shadowAny()))}
         ${block("utility_binary_comparisons", value('A', shadowAny()), value('B', shadowAny()))}
+        ${sep(50)}
+        ${block("utility_void")}
     </category>
 
     ${sep()}
@@ -160,12 +162,11 @@ const toolbox = `
 
     ${sep()}
 
-    <category name="Variables" colour="#D254BB">
+    <category name="Variables" colour="#D254BB" custom="VARIABLES">
     </category>
 
-    <category name="Functions" colour="#CC5294">
+    <category name="Functions" colour="#CC5294" custom="FUNCTIONS">
     </category>
-
 
     ${sep()}
 `;

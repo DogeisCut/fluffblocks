@@ -342,7 +342,10 @@ Blockly.Blocks["control_switch"] = {
             valInput.connection.setShadowDom(shadowDom);
             if (!empty) {
                 const doInput = this.appendStatementInput('DO' + i)
-                // TODO: maybe automatically add break block?
+                var doShadowDom = Blockly.utils.xml.textToDom(
+                    `<shadow type="control_break"></shadow>`
+                );
+                doInput.connection.setShadowDom(doShadowDom);
             }
             i++;
         });

@@ -45,6 +45,17 @@ Blockly.Blocks["utility_binary_comparisons"] = {
 };
 
 
+Blockly.Blocks["utility_void"] = {
+    init: function () {
+        this.setInputsInline(true);
+        this.appendValueInput("ANY").appendField("void")
+        this.setPreviousStatement(true, "default");
+        this.setNextStatement(true, "default");
+        this.setStyle("utility_blocks");
+    },
+};
+
+
 
 BlocklyJS.javascriptGenerator.forBlock["utility_binary_operations"] = function (block, generator) {
     const MENU = block.getFieldValue("MENU");
@@ -81,4 +92,9 @@ BlocklyJS.javascriptGenerator.forBlock["utility_binary_comparisons"] = function 
     const B = generator.valueToCode(block, "B", BlocklyJS.Order.ATOMIC) || "";
 
     return [`${A} ${MENU} ${B}`, BlocklyJS.Order.NONE];
+};
+
+BlocklyJS.javascriptGenerator.forBlock["utility_void"] = function (block, generator) {
+    const ANY = generator.valueToCode(block, "ANY", BlocklyJS.Order.ATOMIC) || "";
+    return `(${ANY});\n`;
 };

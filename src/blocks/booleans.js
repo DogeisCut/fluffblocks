@@ -47,7 +47,7 @@ Blockly.Blocks["booleans_binary_logic"] = {
 BlocklyJS.javascriptGenerator.forBlock["booleans_any_to_boolean"] = function (block, generator) {
     const ANY = generator.valueToCode(block, "ANY", BlocklyJS.Order.ATOMIC) || '';
 
-    return [`Boolean(${ANY})`, BlocklyJS.Order.NONE];
+    return [`Boolean(${ANY})`, BlocklyJS.Order.ATOMIC];
 };
 
 BlocklyJS.javascriptGenerator.forBlock["booleans_not"] = function (block, generator) {
@@ -74,7 +74,7 @@ BlocklyJS.javascriptGenerator.forBlock["booleans_binary_logic"] = function (bloc
             return [`!${A} || !${B}`, BlocklyJS.Order.NONE]
         case 'xnor':
             return [`!${A} != !${B}`, BlocklyJS.Order.NONE]
+        default:
+            return [`${A} || ${B}`, BlocklyJS.Order.NONE]
     }
-
-    return [``, BlocklyJS.Order.NONE];
 };

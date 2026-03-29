@@ -24,6 +24,7 @@ Blockly.Blocks["arrays_array_mutator_item"] = {
 }
 // TODO: fix really minor undo issue where blocks added into inputs dont get deleted when undoing
 // TODO: make shadowed blocks save the values typed in them too
+// My switch case doesnt have either of these issues, so i porbably wanna yoink some of what i did there for here
 Blockly.Blocks['arrays_array'] = {
     init: function () {
         this.itemCount_ = 0;

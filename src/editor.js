@@ -1,9 +1,3 @@
-/**
- * @license
- * Copyright 2023 Google LLC
- * SPDX-License-Identifier: Apache-2.0
- */
-
 import * as Blockly from 'blockly';
 import {registerContinuousToolbox} from '@blockly/continuous-toolbox';
 import {javascriptGenerator} from 'blockly/javascript';
@@ -30,7 +24,7 @@ const toolboxElement = document.createElement("toolbox");
 toolboxElement.innerHTML = toolbox;
 registerContinuousToolbox();
 const ws = Blockly.inject(blocklyDiv, {
-	toolbox: toolboxElement,
+	toolbox: { "kind": "categoryToolbox", "contents": [] },
 	collapse: true,
 	comments: true,
 	css: true,
@@ -80,14 +74,19 @@ const ws = Blockly.inject(blocklyDiv, {
 });
 
 ws.registerToolboxCategoryCallback("VARIABLES", function (_) {
-  const xmlList = [];
-  return xmlList;
+	//STUB
+	const xmlList = [];
+	return xmlList;
 });
 
 ws.registerToolboxCategoryCallback("FUNCTIONS", function (_) {
-  const xmlList = [];
-  return xmlList;
+	//STUB
+	const xmlList = [];
+	return xmlList;
 });
+
+ws.updateToolbox(toolboxElement);
+ws.getToolbox().refreshSelection();
 
 // will replace this with stuff to interface with the vm later
 const compile = () => {
