@@ -22,138 +22,112 @@ Blockly.Blocks["arrays_array_mutator_item"] = {
         this.savedValue_ = null;
     },
 }
-// TODO: fix really minor undo issue where blocks added into inputs dont get deleted when undoing
-// TODO: make shadowed blocks save the values typed in them too
-// My switch case doesnt have either of these issues, so i porbably wanna yoink some of what i did there for here
-Blockly.Blocks['arrays_array'] = {
+Blockly.Blocks['arrays_create_array'] = {
     init: function () {
-        this.itemCount_ = 0;
-        this.nextId_ = 0;
-        this.setInputsInline(true);
-        this.appendDummyInput().appendField('array');
+        this.setInputsInline(true); 
+        this.appendDummyInput().appendField('create array');
         this.setOutput(true, 'Array');
         this.setStyle('arrays_blocks');
-        this.updateShape_([]);
         this.setMutator(new Blockly.icons.MutatorIcon(['arrays_array_mutator_item'], this));
-    },
-
-    newItemId_: function () {
-        return 'ITEM' + (this.nextId_++);
+        this.itemCount_ = 0;
+        this.updateShape_();
     },
 
     mutationToDom: function () {
         var container = Blockly.utils.xml.createElement('mutation');
-        container.setAttribute('nextid', this.nextId_);
-        (this.itemIds_ || []).forEach((id, i) => {
-            var item = Blockly.utils.xml.createElement('item');
-            item.setAttribute('id', id);
-            container.appendChild(item);
-        });
+        container.setAttribute('items', this.itemCount_);
         return container;
     },
 
     domToMutation: function (xmlElement) {
-        this.nextId_ = parseInt(xmlElement.getAttribute('nextid') || '0', 10);
-        var ids = Array.from(xmlElement.querySelectorAll('item'))
-            .map(el => el.getAttribute('id'));
-        this.itemCount_ = ids.length;
-        this.updateShape_(ids);
+        this.itemCount_ = parseInt(xmlElement.getAttribute('items') || '0', 10);
+        this.updateShape_();
     },
 
     decompose: function (workspace) {
-        var topBlock = workspace.newBlock('arrays_array_mutator_items');
-        topBlock.initSvg();
+        var containerBlock = workspace.newBlock('arrays_array_mutator_items');
+        containerBlock.initSvg();
+        var connection = containerBlock.getInput('DO').connection;
 
-        var connection = topBlock.getInput('DO').connection;
-        for (var id of (this.itemIds_ || [])) {
+        for (var i = 0; i < this.itemCount_; i++) {
             var itemBlock = workspace.newBlock('arrays_array_mutator_item');
-            itemBlock.itemId_ = id;
             itemBlock.initSvg();
             connection.connect(itemBlock.previousConnection);
             connection = itemBlock.nextConnection;
         }
-
-        return topBlock;
+        return containerBlock;
     },
 
-    compose: function (topBlock) {
-        var itemBlock = topBlock.getInputTargetBlock('DO');
+    compose: function (containerBlock) {
+        var itemBlock = containerBlock.getInputTargetBlock('DO');
+        var connections = [];
+        var shadowValues = [];
 
-        var ids = [];
-        var connections = {};
         while (itemBlock && !itemBlock.isInsertionMarker()) {
-            if (!itemBlock.itemId_) itemBlock.itemId_ = this.newItemId_();
-            ids.push(itemBlock.itemId_);
-            connections[itemBlock.itemId_] = itemBlock.savedConnection_ || null;
-            itemBlock = itemBlock.nextConnection &&
-                itemBlock.nextConnection.targetBlock();
+            connections.push(itemBlock.valueConnection_);
+            shadowValues.push(itemBlock.savedShadowValue_ || null);
+            itemBlock = itemBlock.nextConnection && itemBlock.nextConnection.targetBlock();
         }
 
-        this.itemCount_ = ids.length;
-        this.updateShape_(ids, connections);
+        this.itemCount_ = connections.length;
+        this.updateShape_();
+        this.reconnectChildBlocks_(connections, shadowValues);
     },
 
-    saveConnections: function (topBlock) {
-        var itemBlock = topBlock.getInputTargetBlock('DO');
-        while (itemBlock && !itemBlock.isInsertionMarker()) {
-            if (itemBlock.itemId_) {
-                var input = this.getInput(itemBlock.itemId_);
-                if (input) {
-                    var target = input.connection.targetBlock();
-                    if (target && !target.isShadow()) {
-                        itemBlock.savedConnection_ = input.connection.targetConnection;
-                    } else {
-                        itemBlock.savedConnection_ = null;
-                    }
-                }
+    saveConnections: function (containerBlock) {
+        var itemBlock = containerBlock.getInputTargetBlock('DO');
+        var i = 0;
+        while (itemBlock) {
+            var input = this.getInput('ADD' + i);
+            if (input) {
+                itemBlock.valueConnection_ = input.connection.targetConnection;
+                
+                var shadowState = input.connection.getShadowState(true);
+                itemBlock.savedShadowValue_ = shadowState?.fields?.ANY || null;
             }
-            itemBlock = itemBlock.nextConnection &&
-                itemBlock.nextConnection.targetBlock();
+            itemBlock = itemBlock.nextConnection && itemBlock.nextConnection.targetBlock();
+            i++;
         }
     },
 
-    updateShape_: function (ids, connections) {
-        connections = connections || {};
-        var existing = this.inputList
-            .map(i => i.name)
-            .filter(n => n && n.startsWith('ITEM'));
-
-        for (var name of existing) {
-            if (!ids.includes(name)) {
-                var input = this.getInput(name);
-                if (input && input.connection) {
-                    var target = input.connection.targetBlock();
-                    if (target && target.isShadow()) target.dispose();
-                }
-                this.removeInput(name, true);
-            }
+    updateShape_: function () {
+        var i = 0;
+        while (this.getInput('ADD' + i)) {
+            this.removeInput('ADD' + i);
+            i++;
         }
 
-        for (var i = 0; i < ids.length; i++) {
-            var id = ids[i];
-            if (!this.getInput(id)) {
-                var input = this.appendValueInput(id).setCheck(null);
-                var conn = connections[id];
+        for (var i = 0; i < this.itemCount_; i++) {
+            var input = this.appendValueInput('ADD' + i);
+            // if (i === 0) { // not sure i like the way this looks
+            //     input.appendField('with');
+            // }
+            
+            var shadowDom = Blockly.utils.xml.textToDom(
+                '<shadow type="values_any"></shadow>'
+            );
+            input.connection.setShadowDom(shadowDom);
+        }
+    },
 
-                if (conn && conn.getSourceBlock && conn.getSourceBlock()) {
-                    conn.reconnect(this, id);
-                }
+    reconnectChildBlocks_: function (connections, shadowValues) {
+        for (var i = 0; i < this.itemCount_; i++) {
+            var input = this.getInput('ADD' + i);
+            if (!input) continue;
 
+            var connection = connections[i];
+            if (connection && connection.getSourceBlock() && !connection.getSourceBlock().disposed) {
+                input.connection.connect(connection);
+            }
+
+            if (shadowValues[i] !== null) {
                 var shadowDom = Blockly.utils.xml.textToDom(
-                    '<shadow type="values_any"></shadow>'
+                    `<shadow type="values_any"><field name="ANY">${shadowValues[i]}</field></shadow>`
                 );
                 input.connection.setShadowDom(shadowDom);
             }
-            this.moveInputBefore(id, null);
         }
-
-        for (var i = ids.length - 1; i >= 0; i--) {
-            var after = i < ids.length - 1 ? ids[i + 1] : null;
-            this.moveInputBefore(ids[i], after);
-        }
-
-        this.itemIds_ = ids;
-    },
+    }
 };
 
 Blockly.Blocks['arrays_array_builder'] = {
@@ -178,9 +152,15 @@ Blockly.Blocks["arrays_append_value_to_builder"] = { // todo: warning when not i
 };
 
 
+
 BlocklyJS.javascriptGenerator.forBlock["arrays_array"] = function (block, generator) {
-    var items = (block.itemIds_ || []).map(function (id) {
-        return generator.valueToCode(block, id, BlocklyJS.Order.NONE) || 'null';
-    });
-    return ['[' + items.join(', ') + ']', BlocklyJS.Order.ATOMIC];
+    var items = [];
+    
+    for (var i = 0; i < block.itemCount_; i++) {
+        var valueCode = generator.valueToCode(block, 'ADD' + i, BlocklyJS.Order.NONE) || 'null';
+        items.push(valueCode);
+    }
+
+    var code = '[' + items.join(', ') + ']';
+    return [code, BlocklyJS.Order.ATOMIC];
 };

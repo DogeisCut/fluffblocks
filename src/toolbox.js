@@ -96,7 +96,7 @@ const toolbox = `
     </category>
 
     <category name="Arrays" colour="#5EEB77">
-        ${block("arrays_array", '<mutation nextid="1"><item id="ITEM0"></item></mutation>')}
+        ${block("arrays_create_array", '<mutation items="1"></mutation>')}
         ${sep(50)}
         ${block("arrays_array_builder")}
         ${block("arrays_append_value_to_builder", value('ANY', shadowAny('foo')))}
